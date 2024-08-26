@@ -75,13 +75,10 @@ const emailSender = {
             filename: "ITC price list.pdf", // Replace with your first PDF file name
             path: "./ITC price list.pdf", // Replace with the actual file path
           },
-          {
-            filename: "prodict broucher.pdf", // Replace with your first PDF file name
-            path: "./prodict broucher.pdf", // Replace with the actual file path
-          },
+       
         ],
       };
-
+    
       await transporter.sendMail(mailOptions);
       isEmailsends = true;
     } catch (error) {
