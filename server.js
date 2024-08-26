@@ -11,7 +11,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Connect to MongoDB
-
+ 
 mongoose
   .connect(
     "mongodb+srv://satyampandit021:20172522@rvbmhotelbooking.9hfzkrx.mongodb.net/itc?retryWrites=true&w=majority",
@@ -40,7 +40,7 @@ app.post("/api/submit", async (req, res) => {
   console.log(req.body);
   try {
     await formData.save();
-    await emailSender.welcomeEmail(req.body.email, req.body.mobile);
+    await emailSender.welcomeEmail(req.body.email, req.body.mobile, req.body.name);
     res.status(200).send("Form data saved successfully");
   } catch (error) {
     res.status(500).send("Failed to save form data");
@@ -82,7 +82,7 @@ app.post(`/api/leads`, async (req, res) => {
 });
 
 app.get("/api", async (req, res) => {
-  return res.send("Hello");
+  return res.send("Hello latest");
 });
 
 // Start the server
