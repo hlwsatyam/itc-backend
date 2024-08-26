@@ -68,14 +68,17 @@ const emailSender = {
 
         attachments: [
           {
-            filename: "Itc Application Form.pdf", // Replace with your first PDF file name
+            filename: "Itc Franchisee Partner Application Form.pdf", // Replace with your first PDF file name
             path: "./ITC.pdf", // Replace with the actual file path
           },
           {
             filename: "ITC price list.pdf", // Replace with your first PDF file name
             path: "./ITC price list.pdf", // Replace with the actual file path
           },
-       
+          {
+            filename: "Prodict broucher.pdf", // Replace with your first PDF file name
+            path: "./prodict broucher.pdf", // Replace with the actual file path
+          },
         ],
       };
     
