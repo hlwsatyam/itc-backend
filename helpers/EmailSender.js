@@ -8,18 +8,15 @@ const nodemailer = require("nodemailer");
 //   },
 // });
 
-
 const transporter = nodemailer.createTransport({
-  host: 'smtp.hostinger.com', // SMTP server for Hostinger
+  host: "smtp.hostinger.com", // SMTP server for Hostinger
   port: 465, // SSL port for secure communication
   secure: true, // true for 465, false for other ports
   auth: {
-    user: 'contactus@itcportals.com', // Your Hostinger webmail email address
-    pass: 'Sanjay@9523', // Your Hostinger webmail password
+    user: "contactus@itcportals.com", // Your Hostinger webmail email address
+    pass: "Sanjay@9523", // Your Hostinger webmail password
   },
 });
-
-
 
 const emailSender = {
   welcomeEmail: async (email, phone, name) => {
@@ -68,13 +65,20 @@ const emailSender = {
           </div>
         </div>
       `,
-      
+
         attachments: [
           {
             filename: "Itc Application Form.pdf", // Replace with your first PDF file name
             path: "./ITC.pdf", // Replace with the actual file path
           },
-         
+          {
+            filename: "ITC price list.pdf", // Replace with your first PDF file name
+            path: "./ITC price list.pdf", // Replace with the actual file path
+          },
+          {
+            filename: "prodict broucher.pdf", // Replace with your first PDF file name
+            path: "./prodict broucher.pdf", // Replace with the actual file path
+          },
         ],
       };
 
@@ -89,4 +93,3 @@ const emailSender = {
 };
 
 module.exports = emailSender;
-    
