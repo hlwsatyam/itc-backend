@@ -25,7 +25,7 @@ const formSchema = new mongoose.Schema({
   mobile: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   email: String,
   address: String,
@@ -56,7 +56,7 @@ app.post("/api/submit", async (req, res) => {
 });
 app.post("/api/login", async (req, res) => {
   const { email, password, role } = req.body;
-  console.log(req.body);
+   
   try {
     if (
       role === "admin" &&
@@ -64,10 +64,10 @@ app.post("/api/login", async (req, res) => {
       password === "123456"
     ) {
       return res.status(200).json({ role: "admin" });
-    }
-    if (role === "customer") {
-      const userExist = await Form.findOne({ email: email, mobile: password });
-      if (userExist) {
+    } 
+    if (role === "customer" && password === "abc@123") {
+      const userExist = await Form.findOne({ mobile: email });
+      if (userExist) { 
         return res.status(200).json({ role: "customer" });
       } else {
         return res.status(203).json({ role: "" });
@@ -88,6 +88,17 @@ app.post(`/api/leads`, async (req, res) => {
     return res.status(203).json({ message: "Something went wrong" });
   }
 });
+
+app.post(`/api/lead`, async (req, res) => {
+  const { mobile } = req.body;
+  try {
+    const leads = await Form.findOne({mobile});
+    return res.status(200).json(leads);
+  } catch (error) {
+    return res.status(203).json({ message: "Something went wrong" });
+  }
+});
+
 app.post(`/api/leads/:query`, async (req, res) => {
   const { query } = req.params;
   console.log("v");
