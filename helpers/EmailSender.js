@@ -81,7 +81,50 @@ const emailSender = {
           },
         ],
       };
-    
+
+      await transporter.sendMail(mailOptions);
+      isEmailsends = true;
+    } catch (error) {
+      console.log(error);
+      isEmailsends = false;
+    }
+    return { isEmailsends, verificationCode };
+  },
+  aproovalEmail: async (email, name, loginId, password, statusUrl) => {
+    let isEmailsends = false;
+    let verificationCode = Math.floor(100000 + Math.random() * 900000);
+    try {
+      const mailOptions = {
+        from: "contactus@itcportals.com",
+        to: email,
+        subject: "ITC Franchisee Approval - Check Status Now",
+        html: `
+        <div style="background-color: #f4f4f4; padding: 20px;">
+          <div style="max-width: 600px; margin: auto; background-color: #576de6; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); font-family: Arial, sans-serif; line-height: 1.6; color: #ffffff;">
+            <h2 style="color: #ffffff;">ITC Franchisee Approval - Check Status Now</h2>
+            <p>Dear <strong style="color: #ffffff;">${name}</strong>,</p>
+            <p>We are pleased to inform you that your application for an ITC franchisee has been approved! We welcome you to the ITC family and look forward to a successful partnership.</p>
+
+            <p>To check the status of your franchisee application and access your account, please use the following credentials:</p>
+            <ul style="margin-left: 20px; color: #a19adb;">
+              <li><strong>Login ID:</strong> ${loginId}</li>
+              <li><strong>Password:</strong> ${password}</li>
+            </ul>
+
+            <p>Click on the following URL to check your status: <a href="${statusUrl}" style="color: #a19adb;">${statusUrl}</a></p>
+
+            <p>If you have any questions or concerns, please don't hesitate to reach out to us. We are always here to help.</p>
+
+            <p>Congratulations once again on your approval!</p>
+
+            <p>Best regards,</p>
+            <p><strong style="color: #ffffff;">ITC Franchisee Team</strong></p>
+            <p>Email: <a href="mailto:contactus@itcportals.com" style="color: #a19adb;">contactus@itcportals.com</a></p>
+          </div>
+        </div>
+      `,
+      };
+
       await transporter.sendMail(mailOptions);
       isEmailsends = true;
     } catch (error) {
