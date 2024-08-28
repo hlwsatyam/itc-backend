@@ -223,6 +223,10 @@ app.get("/api/approval-letter", async (req, res) => {
     if (!user || !user.approval) {
       return res.status(404).json({ error: "Approval letter not found" });
     }
+    function generateUniqueOTP() {
+      const otp = Math.floor(100000 + Math.random() * 900000);
+      return otp.toString();
+    }
 
     const doc = new PDFDocument({
       margins: { top: 50, bottom: 50, left: 72, right: 72 },
@@ -252,9 +256,10 @@ app.get("/api/approval-letter", async (req, res) => {
     // Calculate the x and y coordinates to center the image
     const x = (doc.page.width - imageWidth) / 2;
     const y = (doc.page.height - imageHeight) / 2;
-    doc.rect(x, y, imageWidth, imageHeight)
-    .fillOpacity(0.8) // Adjust the opacity here (0 = fully transparent, 1 = fully opaque)
-    .fill("#ffffff"); // White color overlay
+    doc
+      .rect(x, y, imageWidth, imageHeight)
+      .fillOpacity(0.8) // Adjust the opacity here (0 = fully transparent, 1 = fully opaque)
+      .fill("#ffffff"); // White color overlay
     doc.image(backgroundPath, x, y, { width: imageWidth, height: imageHeight });
 
     // Overlay background color (optional, semi-transparent)
@@ -313,10 +318,10 @@ app.get("/api/approval-letter", async (req, res) => {
       .font("Helvetica")
       .list([
         `Franchisee Name: ${user.name}`,
-        `Franchisee Code: ${user._id} `,
+        `Franchisee Code: itc/ ${generateUniqueOTP()}`,
         `Product Categories: ITC`,
         `Term: 10 Years`,
-        `Renewal Terms: ₹42,500 `,
+        `Renewal Terms: Every Year `,
       ])
       .moveDown(2);
 
@@ -331,7 +336,7 @@ app.get("/api/approval-letter", async (req, res) => {
       .font("Helvetica")
       .list([
         `Execution of the Franchisee Agreement within 3 days from the date of this letter.`,
-        `Payment of the Franchisee fee of ₹42,500 and other applicable charges.`,
+        `Payment of the Franchisee fee of ₹42,500 [ Forty-two thousand Five hundred ] and other applicable charges.`,
         `Completion of the training program conducted by ITC.`,
       ])
       .moveDown(2);
@@ -359,23 +364,12 @@ app.get("/api/approval-letter", async (req, res) => {
         `Account Holder Name: ${bankDetails.holderName}`,
       ])
       .moveDown(2);
-   
- 
 
-      doc.addPage();
+    doc.addPage();
 
-      // Apply the background image on the second page as well
-     
+    // Apply the background image on the second page as well
 
-      doc.image(backgroundPath, x, y, { width: imageWidth, height: imageHeight });
-  
-
-
-
-
-
-
-
+    doc.image(backgroundPath, x, y, { width: imageWidth, height: imageHeight });
 
     doc
       .text(
