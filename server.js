@@ -318,7 +318,7 @@ app.get("/api/approval-letter", async (req, res) => {
       .font("Helvetica")
       .list([
         `Franchisee Name: ${user.name}`,
-        `Franchisee Code: itc/ ${generateUniqueOTP()}`,
+        `Franchisee Code: itc/${generateUniqueOTP()}`,
         `Product Categories: ITC`,
         `Term: 10 Years`,
         `Renewal Terms: Every Year `,
