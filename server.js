@@ -365,7 +365,7 @@ app.get("/api/approval-letter", async (req, res) => {
       ])
       .moveDown(2);
 
-    doc.addPage();
+     
 
     // Apply the background image on the second page as well
 
@@ -390,11 +390,8 @@ app.get("/api/approval-letter", async (req, res) => {
       .fontSize(12)
       .text("Best Regards,", { lineGap: 5 })
       .moveDown()
-      .font("Helvetica-Bold")
-      .text("Sourav Goel")
       .font("Helvetica")
-      .text("ITC Franchisee Development Team")
-      .text("Email: contactus@itcportals.com");
+      .text("ITC Franchisee Development Team");
 
     doc.end(); // End the PDF stream here
 
