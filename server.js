@@ -6,7 +6,7 @@ const moment = require("moment");
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
-
+const multer = require("multer");
 const emailSender = require("./helpers/EmailSender");
 // Initialize Express
 const app = express();
@@ -14,6 +14,21 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, "uploads");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir);
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({ storage });
 
 // Connect to MongoDB
 
@@ -32,11 +47,9 @@ const formSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  approval: {
-    // Fixed spelling from "aprooval" to "approval"
-    type: Boolean,
-    default: false,
-  },
+  approvalLetter: String,
+  agreementLetterName: String,
+  purchaseOrderLetterName: String,
   approvalDate: String,
   email: String,
   address: String,
@@ -59,158 +72,6 @@ const BankDetailSchema = new mongoose.Schema({
 const BankDetail = mongoose.model("BankDetail", BankDetailSchema);
 
 app.use("/static", express.static(path.join(__dirname, "public")));
-
-// app.get("/api/approval-letter", async (req, res) => {
-//   try {
-//     const { mobile } = req.query;
-
-//     // Fetch user details from database
-//     const user = await Form.findOne({ mobile: mobile });
-//     const bankDetails = await BankDetail.findOne();
-
-//     if (!user || !user.approval) {
-//       return res.status(404).json({ error: "Approval letter not found" });
-//     }
-
-//     const doc = new PDFDocument({
-//       margins: { top: 50, bottom: 50, left: 72, right: 72 },
-//       size: "A4",
-//       info: {
-//         Title: "Approval Letter",
-//         Author: "ITC Franchisee Development Team",
-//       },
-//     });
-
-//     res.setHeader(
-//       "Content-Disposition",
-//       'attachment; filename="approval-letter.pdf"'
-//     );
-//     res.setHeader("Content-Type", "application/pdf");
-
-//     doc.pipe(res);
-
-//     // Header
-//     doc
-//       .fontSize(25)
-//       .font("Helvetica-Bold")
-//       .fillColor("#1a1a1a")
-//       .text("Approval Letter", { align: "center" })
-//       .moveDown(2);
-
-//     // Date and Recipient Info
-//     doc
-//       .fontSize(12)
-//       .fillColor("#000")
-//       .font("Helvetica")
-//       .text(`Date:  ${user?.approvalDate} `)
-//       .moveDown();
-
-//     doc.text(`To:`, { continued: true }).font("Helvetica-Bold").text(user.name);
-//     doc
-//       .font("Helvetica")
-//       .text(`Address: ${user?.address}`)
-//       .text(`State: ${user?.state}`)
-//       .text(`Pincode: ${user.pincode}`)
-//       .text(`Post Office: ${user.postOffice}`)
-//       .moveDown(2);
-
-//     // Body
-//     doc
-//       .fontSize(12)
-//       .text(
-//         `Dear ${user.name},\n\nWe are pleased to inform you that your application for an ITC Franchisee has been approved. We welcome you to the ITC family and congratulate you on taking the first step towards a successful business venture.`,
-//         { lineGap: 5 }
-//       )
-//       .moveDown(2);
-
-//     doc
-//       .font("Helvetica-Bold")
-//       .text("Below are the details of your franchisee approval:", {
-//         underline: true,
-//       })
-//       .moveDown();
-
-//     doc
-//       .font("Helvetica")
-//       .list([
-//         `Franchisee Name: ${user.name}`,
-//         `Franchisee Code: ${user._id} `,
-//         `Product Categories: ITC`,
-//         `Term: 10 Years`,
-//         `Renewal Terms: ₹42,500 `,
-//       ])
-//       .moveDown(2);
-
-//     doc
-//       .font("Helvetica-Bold")
-//       .text(
-//         "Please note that this approval is subject to the following conditions:"
-//       )
-//       .moveDown();
-
-//     doc
-//       .font("Helvetica")
-//       .list([
-//         `Execution of the Franchisee Agreement within 3 days from the date of this letter.`,
-//         `Payment of the Franchisee fee of ₹42,500 and other applicable charges.`,
-//         `Completion of the training program conducted by ITC.`,
-//       ])
-//       .moveDown(2);
-
-//     doc
-//       .text(
-//         `We request you to sign and return one copy of this letter to us within 48 hours from the date of receipt, indicating your acceptance of the terms and conditions.`,
-//         { lineGap: 5 }
-//       )
-//       .moveDown(2);
-
-//     doc
-//       .font("Helvetica-Bold")
-//       .text("Bank Details for Franchisee Fee Payment:", {
-//         underline: true,
-//       })
-//       .moveDown();
-
-//     doc
-//       .font("Helvetica")
-//       .list([
-//         `Account Number: ${bankDetails.accountNumber}`,
-//         `IFSC Code: ${bankDetails.ifscCode}`,
-//         `Bank Name: ${bankDetails.bankName}`,
-//         `Account Holder Name: ${bankDetails.holderName}`,
-//       ])
-//       .moveDown(2);
-
-//     doc
-//       .text(
-//         `Please note that this payment will be adjusted against your future purchase orders. We appreciate your prompt attention to this matter and look forward to a successful partnership.`,
-//         { lineGap: 5 }
-//       )
-//       .moveDown(2);
-
-//     doc
-//       .text(
-//         `Congratulations once again on becoming an ITC Franchisee! We look forward to a successful partnership.`,
-//         { lineGap: 5 }
-//       )
-//       .moveDown(2);
-
-//     // Footer
-//     doc
-//       .fontSize(12)
-//       .text("Best Regards,", { lineGap: 5 })
-//       .moveDown()
-//       .font("Helvetica-Bold")
-//       .text("Sourav Goel")
-//       .font("Helvetica")
-//       .text("ITC Franchisee Development Team")
-//       .text("Email: contactus@itcportals.com");
-
-//     doc.end();
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// });
 
 app.get("/api/approval-letter", async (req, res) => {
   try {
@@ -249,8 +110,6 @@ app.get("/api/approval-letter", async (req, res) => {
     const backgroundPath = path.resolve(__dirname, "./background.jpeg");
 
     // Load the image to get its dimensions
-
-     
 
     // Overlay background color (optional, semi-transparent)
     // doc
@@ -369,8 +228,6 @@ app.get("/api/approval-letter", async (req, res) => {
 
     // Apply the background image on the second page as well
 
-     
-
     doc
       .text(
         `Please note that this payment will be adjusted against your future purchase orders. We appreciate your prompt attention to this matter and look forward to a successful partnership.`,
@@ -426,6 +283,46 @@ Please be advised that an approval fee must be paid within 24 hours upon receivi
     doc.on("end", () => {
       res.end(); // Finalize the response
     });
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+app.get("/api/agreement-letter", async (req, res) => {
+  const { name } = req.query;
+
+  try {
+    // Assuming your PDF files are stored in a directory called "agreements"
+    const pdfDirectory = path.join(__dirname, "uploads");
+    const pdfFile = path.join(pdfDirectory, `${name}`);
+
+    // Check if the file exists
+    if (fs.existsSync(pdfFile)) {
+      // Send the PDF file as a response
+      res.sendFile(pdfFile);
+    } else {
+      // If the file is not found, send a 404 response
+      res.status(404).json({ error: "Agreement PDF not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+app.get("/api/po-letter", async (req, res) => {
+  const { name } = req.query;
+
+  try {
+    // Assuming your PDF files are stored in a directory called "agreements"
+    const pdfDirectory = path.join(__dirname, "uploads");
+    const pdfFile = path.join(pdfDirectory, `${name}`);
+
+    // Check if the file exists
+    if (fs.existsSync(pdfFile)) {
+      // Send the PDF file as a response
+      res.sendFile(pdfFile);
+    } else {
+      // If the file is not found, send a 404 response
+      res.status(404).json({ error: "Purchase Order PDF not found" });
+    }
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });
   }
@@ -536,17 +433,101 @@ app.post(`/api/lead/sendWelcome/:id`, async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 });
-
-app.post(`/api/lead/sendAprooval/:id`, async (req, res) => {
+app.post(`/api/lead/sendCancel/:id`, async (req, res) => {
   const { id } = req.params;
+  try {
+    const details = await Form.findByIdAndDelete(id);
+    await emailSender.cancelEmail(details.email, details.mobile, details.name);
+    return res.status(200).json({
+      message: `Cancel Mail Sent Successfully! And ${details.name}'s Account Deleted`,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+});
+app.post(`/api/lead/sendBankDetail/:id`, async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const details = await Form.findById(id);
+    const bankDetails = await BankDetail.findOne();
+    await emailSender.bankDetailShareEmail(
+      details.email,
+      details.name,
+      bankDetails?.accountNumber,
+      bankDetails?.bankName,
+      bankDetails?.holderName,
+      bankDetails?.ifscCode
+    );
+    return res.status(200).json({
+      message: `Bank Details Mail Sent Successfully! to ${details.name}`,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+});
 
+// app.post(`/api/lead/sendAprooval/:id`, async (req, res) => {
+//   const { id } = req.params;
+
+//   try {
+//     const details = await Form.findByIdAndUpdate(id, {
+//       approval: true,
+//       approvalDate: moment().format("MMMM Do, YYYY"),
+//     });
+
+//     await emailSender.aproovalEmail(
+//       details.email,
+//       details.name,
+//       details.mobile,
+//       "abc@123",
+//       "https://itcportals.com/check-status"
+//     );
+//     // email: any, name: any, loginId: any, password: any, statusUrl: any
+//     return res
+//       .status(200)
+//       .json({ message: `Aprooval Mail Sent Successfully! to ${details.name}` });
+//   } catch (error) {
+//     return res.status(500).json({ message: "Something went wrong" });
+//   }
+// });
+
+app.post(
+  `/api/lead/sendAgreement/:id`,
+  upload.single("file"),
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const details = await Form.findByIdAndUpdate(id, {
+        approval: true,
+        agreementLetterName: req.file.filename,
+      });
+
+      await emailSender.agreementEmail(
+        details.email,
+        details.name,
+        details.mobile,
+        "abc@123",
+        "https://itcportals.com/check-status"
+      );
+      // email: any, name: any, loginId: any, password: any, statusUrl: any
+      return res.status(200).json({
+        message: `Agreemrnt File Sent Successfully! to ${details.name}`,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Something went wrong" });
+    }
+  }
+);
+app.post(`/api/lead/sendPO/:id`, upload.single("filePO"), async (req, res) => {
+  const { id } = req.params;
   try {
     const details = await Form.findByIdAndUpdate(id, {
-      approval: true,
-      approvalDate: moment().format("MMMM Do, YYYY"),
+      purchaseOrderLetterName: req.file.filename,
     });
 
-    await emailSender.aproovalEmail(
+    await emailSender.POEmail(
       details.email,
       details.name,
       details.mobile,
@@ -554,13 +535,41 @@ app.post(`/api/lead/sendAprooval/:id`, async (req, res) => {
       "https://itcportals.com/check-status"
     );
     // email: any, name: any, loginId: any, password: any, statusUrl: any
-    return res
-      .status(200)
-      .json({ message: `Aprooval Mail Sent Successfully! to ${details.name}` });
+    return res.status(200).json({
+      message: `Purchase Order File Sent Successfully! to ${details.name}`,
+    });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 });
+app.post(
+  `/api/lead/sendApprooval/:id`,
+  upload.single("fileApprooval"),
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const details = await Form.findByIdAndUpdate(id, {
+        approvalLetter: req.file.filename,
+      });
+
+      await emailSender.aproovalEmail(
+        details.email,
+        details.name,
+        details.mobile,
+        "abc@123",
+        "https://itcportals.com/check-status"
+      );
+      // email: any, name: any, loginId: any, password: any, statusUrl: any
+      return res.status(200).json({
+        message: `Aprooval Letter Sent Successfully! to ${details.name}`,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Something went wrong" });
+    }
+  }
+);
 
 app.get("/api", async (req, res) => {
   return res.send("Hello latest");
