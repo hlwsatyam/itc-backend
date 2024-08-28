@@ -391,10 +391,10 @@ app.get("/api/approval-letter", async (req, res) => {
       .text("Best Regards,", { lineGap: 5 })
       .moveDown()
       .font("Helvetica-Bold")
-       
+      .text("Sourav Goel")
       .font("Helvetica")
       .text("ITC Franchisee Development Team")
-    
+      .text("Email: contactus@itcportals.com");
 
     doc.end(); // End the PDF stream here
 
