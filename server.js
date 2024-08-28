@@ -250,17 +250,7 @@ app.get("/api/approval-letter", async (req, res) => {
 
     // Load the image to get its dimensions
 
-    const imageWidth = doc.page.width;
-    const imageHeight = doc.page.height / 2;
-
-    // Calculate the x and y coordinates to center the image
-    const x = (doc.page.width - imageWidth) / 2;
-    const y = (doc.page.height - imageHeight) / 2;
-    doc
-      .rect(x, y, imageWidth, imageHeight)
-      .fillOpacity(0.8) // Adjust the opacity here (0 = fully transparent, 1 = fully opaque)
-      .fill("#ffffff"); // White color overlay
-    doc.image(backgroundPath, x, y, { width: imageWidth, height: imageHeight });
+     
 
     // Overlay background color (optional, semi-transparent)
     // doc
@@ -269,8 +259,14 @@ app.get("/api/approval-letter", async (req, res) => {
     //   .fill("#8490b3");
 
     // Logo
+    // const logoPath = path.resolve(__dirname, "./logo.png");
+    // doc.image(logoPath, doc.page.width - 120, 30, { width: 50 }).moveDown(2);
     const logoPath = path.resolve(__dirname, "./logo.png");
-    doc.image(logoPath, doc.page.width - 120, 30, { width: 50 }).moveDown(2);
+    const logoWidth = 50;
+    const logoX = 72; // Align with the left margin
+    const logoY = 30;
+
+    doc.image(logoPath, logoX, logoY, { width: logoWidth }).moveDown(2);
 
     // Header
     doc
@@ -285,16 +281,22 @@ app.get("/api/approval-letter", async (req, res) => {
       .fontSize(12)
       .fillColor("#000")
       .font("Helvetica")
-      .text(`Date:  ${user?.approvalDate} `)
+      .text(`Date:  ${user?.approvalDate} `, {
+        align: "right",
+      })
       .moveDown();
 
-    doc.text(`To:`, { continued: true }).font("Helvetica-Bold").text(user.name);
+    doc
+      .text(`Address:`, { continued: true })
+      .font("Helvetica")
+      .text(user.address);
     doc
       .font("Helvetica")
-      .text(`Address: ${user?.address}`)
+      .text(`Distict: ${user?.disctict}`)
       .text(`State: ${user?.state}`)
-      .text(`Pincode: ${user.pincode}`)
       .text(`Post Office: ${user.postOffice}`)
+      .text(`Pincode: ${user.pincode}`)
+
       .moveDown(2);
 
     // Body
@@ -319,7 +321,7 @@ app.get("/api/approval-letter", async (req, res) => {
       .list([
         `Franchisee Name: ${user.name}`,
         `Franchisee Code: itc/${generateUniqueOTP()}`,
-        `Product Categories: ITC`,
+        `Product Categories: Itc All Product`,
         `Term: 10 Years`,
         `Renewal Terms: Every Year `,
       ])
@@ -358,23 +360,29 @@ app.get("/api/approval-letter", async (req, res) => {
     doc
       .font("Helvetica")
       .list([
+        `Account Holder Name: ${bankDetails.holderName}`,
         `Account Number: ${bankDetails.accountNumber}`,
         `IFSC Code: ${bankDetails.ifscCode}`,
         `Bank Name: ${bankDetails.bankName}`,
-        `Account Holder Name: ${bankDetails.holderName}`,
       ])
       .moveDown(2);
 
-     
-
     // Apply the background image on the second page as well
 
-    doc.image(backgroundPath, x, y, { width: imageWidth, height: imageHeight });
+     
 
     doc
       .text(
         `Please note that this payment will be adjusted against your future purchase orders. We appreciate your prompt attention to this matter and look forward to a successful partnership.`,
         { lineGap: 5 }
+      )
+      .moveDown(2);
+    doc.text(`Approval Fee Payment`, { lineGap: 2 }).moveDown(2);
+    doc
+      .text(
+        `
+Please be advised that an approval fee must be paid within 24 hours upon receiving approval. This fee is necessary to proceed with the formalization of the agreement. We appreciate your prompt attention to this matter.`,
+        { lineGap: 6 }
       )
       .moveDown(2);
 
@@ -392,6 +400,25 @@ app.get("/api/approval-letter", async (req, res) => {
       .moveDown()
       .font("Helvetica")
       .text("ITC Franchisee Development Team");
+
+    const currentY = doc.y;
+
+    // Load and position the stamp images below the text on the left side
+    const stamp1 = path.resolve(__dirname, "./stm1.jpg");
+    const stamp2 = path.resolve(__dirname, "./stm2.jpg");
+
+    const stampWidth = 90;
+    const padding = 3; // Space between text and images
+
+    // Position the first stamp below the text on the left side
+    doc.image(stamp1, 72, currentY + padding, {
+      width: stampWidth,
+    });
+
+    // Position the second stamp beside the first one on the left side
+    doc.image(stamp2, 72 + stampWidth + 10, currentY + padding, {
+      width: stampWidth,
+    });
 
     doc.end(); // End the PDF stream here
 
