@@ -61,7 +61,7 @@ const emailSender = {
             
             <p>Best regards,</p>
             <p><strong style="color: #ffffff;">Sourabh Goel</strong><br>ITC Franchisee Development Team<br>
-            Email: <a href="mailto:contactus@itcportals.com" style="color: #a19adb;">contactus@itcportals.com</a></p>
+            Email: <a href="mailto:contactus@itcportals.com" style="color: #ffffff;">contactus@itcportals.com</a></p>
           </div>
         </div>
       `,
@@ -98,19 +98,19 @@ const emailSender = {
         from: "contactus@itcportals.com",
         to: email,
         subject: "ITC Franchisee Agreement Cancellation and Refund",
-        html: `
+        html: ` 
           <div style="background-color: #f4f4f4; padding: 20px;">
             <div style="max-width: 600px; margin: auto; background-color: #576de6; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); font-family: Arial, sans-serif; line-height: 1.6; color: #ffffff;">
               <h2 style="color: #ffffff;">ITC Franchisee Agreement Cancellation and Refund</h2>
               <p>Dear <strong style="color: #ffffff;">${name}</strong>,</p>
               <p>I hope this message finds you well.</p>
-              <p>We regret to inform you that your ITC franchisee agreement has been canceled. We apologize for any inconvenience this may cause.</p>
+              <p    >We regret to inform you that your ITC franchisee agreement has been canceled. We apologize for any inconvenience this may cause.</p>
               <p>Please be assured that all amounts paid will be refunded to your account. The refund process will be completed within 90 days.</p>
               <p>Should you have any questions or require further assistance, please feel free to contact us.</p>
               <p>Thank you for your understanding.</p>
               <p>Best regards,</p>
               <p><strong style="color: #ffffff;">ITC Franchisee Team</strong><br>
-              Email: <a href="mailto:contactus@itcportals.com" style="color: #a19adb;">contactus@itcportals.com</a></p>
+              Email: <a href="mailto:contactus@itcportals.com" style="color: #ffffff;">contactus@itcportals.com</a></p>
             </div>
           </div>
         `,
@@ -140,12 +140,12 @@ const emailSender = {
             <p>We are pleased to inform you that your application for an ITC franchisee has been approved! We welcome you to the ITC family and look forward to a successful partnership.</p>
 
             <p>To check the status of your franchisee application and access your account, please use the following credentials:</p>
-            <ul style="margin-left: 20px; color: #a19adb;">
+            <ul style="margin-left: 20px; color: #ffffff;">
               <li><strong>Login ID:</strong> ${loginId}</li>
               <li><strong>Password:</strong> ${password}</li>
             </ul>
 
-            <p>Click on the following URL to check your status: <a href="${statusUrl}" style="color: #a19adb;">${statusUrl}</a></p>
+            <p>Click on the following URL to check your status: <a href="${statusUrl}" style="color: #ffffff;">${statusUrl}</a></p>
 
             <p>If you have any questions or concerns, please don't hesitate to reach out to us. We are always here to help.</p>
 
@@ -153,7 +153,7 @@ const emailSender = {
 
             <p>Best regards,</p>
             <p><strong style="color: #ffffff;">ITC Franchisee Team</strong></p>
-            <p>Email: <a href="mailto:contactus@itcportals.com" style="color: #a19adb;">contactus@itcportals.com</a></p>
+            <p>Email: <a href="mailto:contactus@itcportals.com" style="color: #ffffff;">contactus@itcportals.com</a></p>
           </div>
         </div>
       `,
@@ -181,8 +181,8 @@ const emailSender = {
             <h2 style="color: #ffffff;">ITC Franchisee Agreement Approved - Status Check Information</h2>
             <p>Dear <strong style="color: #ffffff;">${name}</strong>,</p>
             <p>I am pleased to inform you that your ITC franchisee agreement has been approved.</p>
-            <p>To check the status and access further details, please use the following link: <a href="${statusUrl}" style="color: #a19adb;">${statusUrl}</a>. You will need to log in with the credentials provided below:</p>
-            <ul style="margin-left: 20px; color: #a19adb;">
+            <p>To check the status and access further details, please use the following link: <a href="${statusUrl}" style="color: #ffffff;">${statusUrl}</a>. You will need to log in with the credentials provided below:</p>
+            <ul style="margin-left: 20px; color: #ffffff;">
               <li><strong>User ID:</strong> ${loginId}</li>
               <li><strong>Password:</strong> ${password}</li>
             </ul>
@@ -190,7 +190,7 @@ const emailSender = {
             <p>Thank you for your cooperation.</p>
             <p>Best regards,</p>
             <p><strong style="color: #ffffff;">ITC Franchisee Team</strong></p>
-            <p>Email: <a href="mailto:contactus@itcportals.com" style="color: #a19adb;">contactus@itcportals.com</a></p>
+            <p>Email: <a href="mailto:contactus@itcportals.com" style="color: #ffffff;">contactus@itcportals.com</a></p>
           </div>
         </div>
       `,
@@ -266,8 +266,8 @@ const emailSender = {
             <p>Dear <strong style="color: #ffffff;">${name}</strong>,</p>
             <p>I hope this email finds you well.</p>
             <p>We would like to request a purchase order for our ITC franchisee operations. Please process this request at your earliest convenience.</p>
-            <p>To check the status of the purchase order, you can use the following link: <a href="${statusUrl}" style="color: #a19adb;">${statusUrl}</a>. Please log in using the credentials provided below:</p>
-            <ul style="margin-left: 20px; color: #a19adb;">
+            <p>To check the status of the purchase order, you can use the following link: <a href="${statusUrl}" style="color: #ffffff;">${statusUrl}</a>. Please log in using the credentials provided below:</p>
+            <ul style="margin-left: 20px; color: #ffffff;">
               <li><strong>User ID:</strong> ${loginId}</li>
               <li><strong>Password:</strong> ${password}</li>
             </ul>
@@ -275,7 +275,7 @@ const emailSender = {
             <p>Thank you for your prompt attention to this matter.</p>
             <p>Best regards,</p>
             <p><strong style="color: #ffffff;">ITC Franchisee Team</strong></p>
-            <p>Email: <a href="mailto:contactus@itcportals.com" style="color: #a19adb;">contactus@itcportals.com</a></p>
+            <p>Email: <a href="mailto:contactus@itcportals.com" style="color: #ffffff;">contactus@itcportals.com</a></p>
           </div>
         </div>
       `,

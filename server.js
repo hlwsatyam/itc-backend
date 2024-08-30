@@ -47,6 +47,30 @@ const formSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+
+  nameTitle: String,
+  marriageStatus: String,
+  address: String,
+  businessName: String,
+  businessAddress: String,
+  gst: String,
+  fssai: String,
+  businessType: String,
+  experienceInBusiness: String,
+  currentYearTurnover: String,
+  noOfEmploy: String,
+  PriviousExperienceInFranchisee: String,
+  researchedOtherFranchisee: String,
+  estimatedInve4stmentCapacity: String,
+  preferredLocationAvailable: String,
+  haveAnyBusinessPlane: String,
+  projectedTimelineForOpeningFranchisee: String,
+  experienceInMarketing: String,
+  experienceInManagingStore: String,
+  gender: String,
+
+  qualification: String,
+
   approvalLetter: String,
   agreementLetterName: String,
   purchaseOrderLetterName: String,
@@ -71,222 +95,19 @@ const BankDetailSchema = new mongoose.Schema({
 
 const BankDetail = mongoose.model("BankDetail", BankDetailSchema);
 
+
+
+
+ 
+
+
+ 
+ 
+
+
+
 app.use("/static", express.static(path.join(__dirname, "public")));
 
-app.get("/api/approval-letter", async (req, res) => {
-  try {
-    const { mobile } = req.query;
-
-    // Fetch user details from database
-    const user = await Form.findOne({ mobile: mobile });
-    const bankDetails = await BankDetail.findOne();
-
-    if (!user || !user.approval) {
-      return res.status(404).json({ error: "Approval letter not found" });
-    }
-    function generateUniqueOTP() {
-      const otp = Math.floor(100000 + Math.random() * 900000);
-      return otp.toString();
-    }
-
-    const doc = new PDFDocument({
-      margins: { top: 50, bottom: 50, left: 72, right: 72 },
-      size: "A4",
-      info: {
-        Title: "Approval Letter",
-        Author: "ITC Franchisee Development Team",
-      },
-    });
-
-    res.setHeader(
-      "Content-Disposition",
-      'attachment; filename="approval-letter.pdf"'
-    );
-    res.setHeader("Content-Type", "application/pdf");
-
-    doc.pipe(res);
-
-    // Background Image
-    const backgroundPath = path.resolve(__dirname, "./background.jpeg");
-
-    // Load the image to get its dimensions
-
-    // Overlay background color (optional, semi-transparent)
-    // doc
-    //   .rect(0, 12, doc.page.width, doc.page.height)
-    //   .fillOpacity(0.9)
-    //   .fill("#8490b3");
-
-    // Logo
-    // const logoPath = path.resolve(__dirname, "./logo.png");
-    // doc.image(logoPath, doc.page.width - 120, 30, { width: 50 }).moveDown(2);
-    const logoPath = path.resolve(__dirname, "./logo.png");
-    const logoWidth = 50;
-    const logoX = 72; // Align with the left margin
-    const logoY = 30;
-
-    doc.image(logoPath, logoX, logoY, { width: logoWidth }).moveDown(2);
-
-    // Header
-    doc
-      .fontSize(25)
-      .font("Helvetica-Bold")
-      .fillColor("#1a237e") // Custom header color
-      .text("Approval Letter", { align: "center" })
-      .moveDown(2);
-
-    // Date and Recipient Info
-    doc
-      .fontSize(12)
-      .fillColor("#000")
-      .font("Helvetica")
-      .text(`Date:  ${user?.approvalDate} `, {
-        align: "right",
-      })
-      .moveDown();
-
-    doc
-      .text(`Address:`, { continued: true })
-      .font("Helvetica")
-      .text(user.address);
-    doc
-      .font("Helvetica")
-      .text(`Distict: ${user?.disctict}`)
-      .text(`State: ${user?.state}`)
-      .text(`Post Office: ${user.postOffice}`)
-      .text(`Pincode: ${user.pincode}`)
-
-      .moveDown(2);
-
-    // Body
-    doc
-      .fontSize(12)
-      .fillColor("#000")
-      .text(
-        `Dear ${user.name},\n\nWe are pleased to inform you that your application for an ITC Franchisee has been approved. We welcome you to the ITC family and congratulate you on taking the first step towards a successful business venture.`,
-        { lineGap: 5 }
-      )
-      .moveDown(2);
-
-    doc
-      .font("Helvetica-Bold")
-      .text("Below are the details of your franchisee approval:", {
-        underline: true,
-      })
-      .moveDown();
-
-    doc
-      .font("Helvetica")
-      .list([
-        `Franchisee Name: ${user.name}`,
-        `Franchisee Code: itc/${generateUniqueOTP()}`,
-        `Product Categories: Itc All Product`,
-        `Term: 10 Years`,
-        `Renewal Terms: Every Year `,
-      ])
-      .moveDown(2);
-
-    doc
-      .font("Helvetica-Bold")
-      .text(
-        "Please note that this approval is subject to the following conditions:"
-      )
-      .moveDown();
-
-    doc
-      .font("Helvetica")
-      .list([
-        `Execution of the Franchisee Agreement within 3 days from the date of this letter.`,
-        `Payment of the Franchisee fee of ₹42,500 [ Forty-two thousand Five hundred ] and other applicable charges.`,
-        `Completion of the training program conducted by ITC.`,
-      ])
-      .moveDown(2);
-
-    doc
-      .text(
-        `We request you to sign and return one copy of this letter to us within 48 hours from the date of receipt, indicating your acceptance of the terms and conditions.`,
-        { lineGap: 5 }
-      )
-      .moveDown(2);
-
-    doc
-      .font("Helvetica-Bold")
-      .text("Bank Details for Franchisee Fee Payment:", {
-        underline: true,
-      })
-      .moveDown();
-
-    doc
-      .font("Helvetica")
-      .list([
-        `Account Holder Name: ${bankDetails.holderName}`,
-        `Account Number: ${bankDetails.accountNumber}`,
-        `IFSC Code: ${bankDetails.ifscCode}`,
-        `Bank Name: ${bankDetails.bankName}`,
-      ])
-      .moveDown(2);
-
-    // Apply the background image on the second page as well
-
-    doc
-      .text(
-        `Please note that this payment will be adjusted against your future purchase orders. We appreciate your prompt attention to this matter and look forward to a successful partnership.`,
-        { lineGap: 5 }
-      )
-      .moveDown(2);
-    doc.text(`Approval Fee Payment`, { lineGap: 2 }).moveDown(2);
-    doc
-      .text(
-        `
-Please be advised that an approval fee must be paid within 24 hours upon receiving approval. This fee is necessary to proceed with the formalization of the agreement. We appreciate your prompt attention to this matter.`,
-        { lineGap: 6 }
-      )
-      .moveDown(2);
-
-    doc
-      .text(
-        `Congratulations once again on becoming an ITC Franchisee! We look forward to a successful partnership.`,
-        { lineGap: 5 }
-      )
-      .moveDown(2);
-
-    // Footer
-    doc
-      .fontSize(12)
-      .text("Best Regards,", { lineGap: 5 })
-      .moveDown()
-      .font("Helvetica")
-      .text("ITC Franchisee Development Team");
-
-    const currentY = doc.y;
-
-    // Load and position the stamp images below the text on the left side
-    const stamp1 = path.resolve(__dirname, "./stm1.jpg");
-    const stamp2 = path.resolve(__dirname, "./stm2.jpg");
-
-    const stampWidth = 90;
-    const padding = 3; // Space between text and images
-
-    // Position the first stamp below the text on the left side
-    doc.image(stamp1, 72, currentY + padding, {
-      width: stampWidth,
-    });
-
-    // Position the second stamp beside the first one on the left side
-    doc.image(stamp2, 72 + stampWidth + 10, currentY + padding, {
-      width: stampWidth,
-    });
-
-    doc.end(); // End the PDF stream here
-
-    // Ensure no additional writes happen after the stream ends
-    doc.on("end", () => {
-      res.end(); // Finalize the response
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
 app.get("/api/agreement-letter", async (req, res) => {
   const { name } = req.query;
 
@@ -342,6 +163,16 @@ app.post("/api/submit", async (req, res) => {
     res.status(500).send("Failed to save form data");
   }
 });
+app.post("/api/editSave/:id",  async (req, res) => {
+  console.log(req.body);
+  const { id } = req.params;
+  try {
+    await Form.findByIdAndUpdate(id, req.body);
+    res.status(200).json({ message: "Form data Updated successfully" });
+  } catch (error) {
+    res.status(500).send("Failed to save form data");
+  }
+});
 app.post("/api/login", async (req, res) => {
   const { email, password, role } = req.body;
 
@@ -389,6 +220,16 @@ app.post(`/api/lead`, async (req, res) => {
   const { mobile } = req.body;
   try {
     const leads = await Form.findOne({ mobile });
+    return res.status(200).json(leads);
+  } catch (error) {
+    return res.status(203).json({ message: "Something went wrong" });
+  }
+});
+app.get(`/api/leadById/:id`, async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const leads = await Form.findById(id);
     return res.status(200).json(leads);
   } catch (error) {
     return res.status(203).json({ message: "Something went wrong" });
