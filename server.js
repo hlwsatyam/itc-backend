@@ -183,7 +183,7 @@ app.get("/api/users/:id", async (req, res) => {
 app.post("/api/users/edit-user", async (req, res) => {
   try {
     await ManagingUser.findByIdAndUpdate(req.body._id, req.body);
-     
+
     res.status(200).json({ message: "User Updated Success!" });
   } catch (error) {
     res.status(500).json({ message: "Server erroraaa." });
@@ -260,6 +260,44 @@ app.get("/api/po-letter", async (req, res) => {
 //   }
 // });
 
+// app.post("/api/submit", async (req, res) => {
+//   const { willMailShare } = req.body;
+//   const formData = new Form(req.body);
+
+//   try {
+//     // Save form data to the database
+//     await formData.save();
+
+//     // Find all executives
+//     const allExecutives = await ManagingUser.find();
+
+//     // Assign lead to an executive who has available lead access
+//     for (let executive of allExecutives) {
+//       const totalAccessibleLead = executive.leadAccessCount;
+//       const totalAssignedLeadTillNow = executive.leads.length;
+
+//       if (
+//         totalAccessibleLead > totalAssignedLeadTillNow &&
+//         !executive.permissions.blocked
+//       ) {
+//         await ManagingUser.findByIdAndUpdate(
+//           executive._id,
+//           { $push: { leads: formData._id } },
+//           { new: true }
+//         );
+//         break; // Stop after assigning to one executive
+//       }
+//     }
+
+//     res.status(200).send("Form data saved and lead assigned successfully");
+//   } catch (error) {
+//     console.error("Error saving form data:", error);
+//     res.status(500).send("Failed to save form data");
+//   }
+// });
+
+let lastAssignedIndex = 0; // Initialize globally
+
 app.post("/api/submit", async (req, res) => {
   const { willMailShare } = req.body;
   const formData = new Form(req.body);
@@ -268,33 +306,45 @@ app.post("/api/submit", async (req, res) => {
     // Save form data to the database
     await formData.save();
 
-    // Find all executives
-    const allExecutives = await ManagingUser.find();
+    // Find all executives who are not blocked
+    const allExecutives = await ManagingUser.find({
+      "permissions.blocked": false,
+    });
 
-    // Assign lead to an executive who has available lead access
-    for (let executive of allExecutives) {
-      const totalAccessibleLead = executive.leadAccessCount;
-      const totalAssignedLeadTillNow = executive.leads.length;
-
-      if (
-        totalAccessibleLead > totalAssignedLeadTillNow &&
-        !executive.permissions.blocked
-      ) {
-        await ManagingUser.findByIdAndUpdate(
-          executive._id,
-          { $push: { leads: formData._id } },
-          { new: true }
-        );
-        break; // Stop after assigning to one executive
-      }
+    // If there are no available executives, send an error response
+    if (allExecutives.length === 0) {
+      return res.status(400).send("No available executives to assign the lead");
     }
 
-    // Send a welcome email
-    // await emailSender.welcomeEmail(
-    //   req.body.email,
-    //   req.body.mobile,
-    //   req.body.name
-    // );
+    // Calculate the index of the next executive in sequence
+    const executiveCount = allExecutives.length;
+
+    // Ensure the last assigned index wraps around if it exceeds the number of executives
+    lastAssignedIndex = lastAssignedIndex % executiveCount;
+
+    // Assign the lead to the next executive in the sequence
+    const executive = allExecutives[lastAssignedIndex];
+
+    const totalAccessibleLead = executive.leadAccessCount;
+    const totalAssignedLeadTillNow = executive.leads.length;
+
+    // Check if the executive can take more leads
+    if (totalAccessibleLead > totalAssignedLeadTillNow) {
+      await ManagingUser.findByIdAndUpdate(
+        executive._id,
+        { $push: { leads: formData._id } },
+        { new: true }
+      );
+
+      // Increment the last assigned index for the next round
+      lastAssignedIndex++;
+    } else {
+      // If the current executive cannot take more leads, increment index and try next
+      lastAssignedIndex++;
+      return res
+        .status(400)
+        .send("Current executive has reached their lead limit. Try again.");
+    }
 
     res.status(200).send("Form data saved and lead assigned successfully");
   } catch (error) {
@@ -304,7 +354,7 @@ app.post("/api/submit", async (req, res) => {
 });
 
 app.post("/api/editSave/:id", async (req, res) => {
-  console.log(req.body);
+ 
   const { id } = req.params;
   try {
     await Form.findByIdAndUpdate(id, req.body);
@@ -325,7 +375,7 @@ app.post("/api/login", async (req, res) => {
           userId: email,
           password: password,
         });
-
+ 
         if (user) {
           return res.status(200).json({ role: "excutive", id: user._id });
         }
@@ -368,6 +418,7 @@ app.post(`/api/leads`, async (req, res) => {
       if (data.permissions.blocked) {
         return res.status(200).json({ leads: [], permissions: {} });
       }
+       
       return res
         .status(200)
         .json({ leads: data.leads, permissions: data.permissions });
@@ -392,7 +443,7 @@ app.post(`/api/lead`, async (req, res) => {
 app.post(`/api/lead/leadManagementStages/:id`, async (req, res) => {
   const { leadManagementStage } = req.body;
   const { id } = req.params;
-  console.log(id, leadManagementStage);
+ 
   try {
     // Update the lead's leadManagementStage field
     await Form.findByIdAndUpdate(id, {
@@ -468,7 +519,7 @@ app.post(`/api/lead/sendCancel/:id`, async (req, res) => {
 });
 app.post(`/api/lead/sendBankDetail/:id`, async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+ 
   try {
     const details = await Form.findById(id);
     const bankDetails = await BankDetail.findOne();
@@ -536,7 +587,7 @@ app.post(
         message: `Agreemrnt File Sent Successfully! to ${details.name}`,
       });
     } catch (error) {
-      console.log(error);
+      
       return res.status(500).json({ message: "Something went wrong" });
     }
   }
@@ -560,7 +611,7 @@ app.post(`/api/lead/sendPO/:id`, upload.single("filePO"), async (req, res) => {
       message: `Purchase Order File Sent Successfully! to ${details.name}`,
     });
   } catch (error) {
-    console.log(error);
+     
     return res.status(500).json({ message: "Something went wrong" });
   }
 });
@@ -586,7 +637,7 @@ app.post(
         message: `Aprooval Letter Sent Successfully! to ${details.name}`,
       });
     } catch (error) {
-      console.log(error);
+     
       return res.status(500).json({ message: "Something went wrong" });
     }
   }
