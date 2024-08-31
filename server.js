@@ -8,6 +8,7 @@ const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const emailSender = require("./helpers/EmailSender");
+
 // Initialize Express
 const app = express();
 
@@ -40,49 +41,53 @@ mongoose
   .then(() => console.log("Db Connected"))
   .catch((err) => console.log(err));
 
-const formSchema = new mongoose.Schema({
-  name: String,
-  mobile: {
-    type: String,
-    required: true,
-    unique: true,
+const formSchema = new mongoose.Schema(
+  {
+    name: String,
+    mobile: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
+    nameTitle: String,
+    marriageStatus: String,
+    leadManagementStages: { type: String, default: "New Lead" },
+    address: String,
+    businessName: String,
+    businessAddress: String,
+    gst: String,
+    fssai: String,
+    businessType: String,
+    experienceInBusiness: String,
+    currentYearTurnover: String,
+    noOfEmploy: String,
+    PriviousExperienceInFranchisee: String,
+    researchedOtherFranchisee: String,
+    estimatedInve4stmentCapacity: String,
+    preferredLocationAvailable: String,
+    haveAnyBusinessPlane: String,
+    projectedTimelineForOpeningFranchisee: String,
+    experienceInMarketing: String,
+    experienceInManagingStore: String,
+    gender: String,
+
+    qualification: String,
+
+    approvalLetter: String,
+    agreementLetterName: String,
+    purchaseOrderLetterName: String,
+    approvalDate: String,
+    email: String,
+    address: String,
+    area: String,
+    pincode: String,
+    disctict: String,
+    state: String,
+    postOffice: String,
   },
-
-  nameTitle: String,
-  marriageStatus: String,
-  address: String,
-  businessName: String,
-  businessAddress: String,
-  gst: String,
-  fssai: String,
-  businessType: String,
-  experienceInBusiness: String,
-  currentYearTurnover: String,
-  noOfEmploy: String,
-  PriviousExperienceInFranchisee: String,
-  researchedOtherFranchisee: String,
-  estimatedInve4stmentCapacity: String,
-  preferredLocationAvailable: String,
-  haveAnyBusinessPlane: String,
-  projectedTimelineForOpeningFranchisee: String,
-  experienceInMarketing: String,
-  experienceInManagingStore: String,
-  gender: String,
-
-  qualification: String,
-
-  approvalLetter: String,
-  agreementLetterName: String,
-  purchaseOrderLetterName: String,
-  approvalDate: String,
-  email: String,
-  address: String,
-  area: String,
-  pincode: String,
-  disctict: String,
-  state: String,
-  postOffice: String,
-});
+  { timestamps: true }
+);
 
 const Form = mongoose.model("Form", formSchema);
 
@@ -94,20 +99,96 @@ const BankDetailSchema = new mongoose.Schema({
 });
 
 const BankDetail = mongoose.model("BankDetail", BankDetailSchema);
+const ManagingAdminUserSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    name: {
+      type: String,
+    },
+    leads: [{ type: mongoose.Schema.ObjectId, ref: "Form" }],
+    password: {
+      type: String,
+      required: true,
+    },
 
-
-
-
- 
-
-
- 
- 
-
-
-
+    leadAccessCount: {
+      type: Number,
+      required: true,
+    },
+    permissions: {
+      Welcome: { type: Boolean, default: false },
+      blocked: { type: Boolean, default: false },
+      Approval: { type: Boolean, default: false },
+      Agreement: { type: Boolean, default: false },
+      PurchaseOrder: { type: Boolean, default: false },
+      Cancellation: { type: Boolean, default: false },
+      ShareBankDetails: { type: Boolean, default: false },
+      Edit: { type: Boolean, default: false },
+      Delete: { type: Boolean, default: false },
+    },
+  },
+  { timestamps: true }
+);
+const ManagingUser = mongoose.model(
+  "ManagingAdminUser",
+  ManagingAdminUserSchema
+);
 app.use("/static", express.static(path.join(__dirname, "public")));
+app.post("/api/users/add", async (req, res) => {
+  const { userId, name, password, leadAccessCount, permissions } = req.body;
 
+  try {
+    const newUser = new ManagingUser({
+      userId,
+      name,
+      password,
+      leadAccessCount,
+      permissions,
+    });
+
+    await newUser.save();
+    res.status(200).json({ message: "User added successfully!" });
+  } catch (error) {
+    if (error.code === 11000) {
+      // Duplicate userId error
+      res.status(400).json({ message: "User ID already exists." });
+    } else {
+      res.status(500).json({ message: "Server error." });
+    }
+  }
+});
+app.get("/api/users/all-user", async (req, res) => {
+  try {
+    const user = await ManagingUser.find();
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server erroraaa." });
+  }
+});
+app.get("/api/users/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await ManagingUser.findById(id);
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server erroraaa." });
+  }
+});
+app.post("/api/users/edit-user", async (req, res) => {
+  try {
+    await ManagingUser.findByIdAndUpdate(req.body._id, req.body);
+     
+    res.status(200).json({ message: "User Updated Success!" });
+  } catch (error) {
+    res.status(500).json({ message: "Server erroraaa." });
+  }
+});
 app.get("/api/agreement-letter", async (req, res) => {
   const { name } = req.query;
 
@@ -148,22 +229,81 @@ app.get("/api/po-letter", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+// app.post("/api/submit", async (req, res) => {
+//   const formData = new Form(req.body);
+
+//   try {
+//     await formData.save();
+
+//     const allExcutive = await ManagingUser.find();
+//     allExcutive.forEach(async (excutive) => {
+//       let totalAccessableLead = excutive.leadAccessCount;
+//       let totalAssignedLeadTillNow = excutive.leads.length;
+//       if (totalAccessableLead > totalAssignedLeadTillNow) {
+//         await ManagingUser.findByIdAndUpdate(
+//           excutive._id,
+//           { $push: { leads: formData._id } },
+//           { new: true }
+//         );
+//         break;
+//       }
+//     });
+
+//     await emailSender.welcomeEmail(
+//       req.body.email,
+//       req.body.mobile,
+//       req.body.name
+//     );
+//     res.status(200).send("Form data saved successfully");
+//   } catch (error) {
+//     res.status(500).send("Failed to save form data");
+//   }
+// });
+
 app.post("/api/submit", async (req, res) => {
+  const { willMailShare } = req.body;
   const formData = new Form(req.body);
-  console.log(req.body);
+
   try {
+    // Save form data to the database
     await formData.save();
-    await emailSender.welcomeEmail(
-      req.body.email,
-      req.body.mobile,
-      req.body.name
-    );
-    res.status(200).send("Form data saved successfully");
+
+    // Find all executives
+    const allExecutives = await ManagingUser.find();
+
+    // Assign lead to an executive who has available lead access
+    for (let executive of allExecutives) {
+      const totalAccessibleLead = executive.leadAccessCount;
+      const totalAssignedLeadTillNow = executive.leads.length;
+
+      if (
+        totalAccessibleLead > totalAssignedLeadTillNow &&
+        !executive.permissions.blocked
+      ) {
+        await ManagingUser.findByIdAndUpdate(
+          executive._id,
+          { $push: { leads: formData._id } },
+          { new: true }
+        );
+        break; // Stop after assigning to one executive
+      }
+    }
+
+    // Send a welcome email
+    // await emailSender.welcomeEmail(
+    //   req.body.email,
+    //   req.body.mobile,
+    //   req.body.name
+    // );
+
+    res.status(200).send("Form data saved and lead assigned successfully");
   } catch (error) {
+    console.error("Error saving form data:", error);
     res.status(500).send("Failed to save form data");
   }
 });
-app.post("/api/editSave/:id",  async (req, res) => {
+
+app.post("/api/editSave/:id", async (req, res) => {
   console.log(req.body);
   const { id } = req.params;
   try {
@@ -178,9 +318,18 @@ app.post("/api/login", async (req, res) => {
 
   try {
     if (role === "admin") {
-      if (email === "test@gmail.com" && password === "123456") {
+      if (email === "Itcadmin@gmail.com" && password === "Sanjay@952354") {
         return res.status(200).json({ role: "admin" });
       } else {
+        const user = await ManagingUser.findOne({
+          userId: email,
+          password: password,
+        });
+
+        if (user) {
+          return res.status(200).json({ role: "excutive", id: user._id });
+        }
+
         return res.status(401).json({ error: "Invalid admin credentials" });
       }
     }
@@ -208,9 +357,24 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.post(`/api/leads`, async (req, res) => {
+  const { id } = req.body;
+
   try {
-    const leads = await Form.find();
-    return res.status(200).json(leads);
+    let leads;
+
+    if (id) {
+      data = await ManagingUser.findById(id).populate("leads");
+
+      if (data.permissions.blocked) {
+        return res.status(200).json({ leads: [], permissions: {} });
+      }
+      return res
+        .status(200)
+        .json({ leads: data.leads, permissions: data.permissions });
+    }
+
+    leads = await Form.find();
+    return res.status(200).json({ leads, permissions: {} });
   } catch (error) {
     return res.status(203).json({ message: "Something went wrong" });
   }
@@ -225,9 +389,24 @@ app.post(`/api/lead`, async (req, res) => {
     return res.status(203).json({ message: "Something went wrong" });
   }
 });
+app.post(`/api/lead/leadManagementStages/:id`, async (req, res) => {
+  const { leadManagementStage } = req.body;
+  const { id } = req.params;
+  console.log(id, leadManagementStage);
+  try {
+    // Update the lead's leadManagementStage field
+    await Form.findByIdAndUpdate(id, {
+      leadManagementStages: leadManagementStage,
+    });
+    return res.status(200).json({ message: "Updated" });
+  } catch (error) {
+    console.error("Error updating lead status:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+});
 app.get(`/api/leadById/:id`, async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+
   try {
     const leads = await Form.findById(id);
     return res.status(200).json(leads);
@@ -238,16 +417,17 @@ app.get(`/api/leadById/:id`, async (req, res) => {
 
 app.post(`/api/leads/:query`, async (req, res) => {
   const { query } = req.params;
-  console.log("v");
+
   try {
     const leads = await Form.find({
       $or: [
         { name: { $regex: query, $options: "i" } },
         { mobile: { $regex: query, $options: "i" } },
         { email: { $regex: query, $options: "i" } },
+        { leadManagementStages: { $regex: query, $options: "i" } },
       ],
     });
-    return res.status(200).json(leads);
+    return res.status(200).json({ leads });
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong" });
   }
@@ -413,7 +593,7 @@ app.post(
 );
 
 app.get("/api", async (req, res) => {
-  return res.send("Hello latest");
+  return res.send("Hello VPS");
 });
 
 app.post("/api/bank-details", async (req, res) => {
