@@ -71,7 +71,7 @@ const formSchema = new mongoose.Schema(
     experienceInMarketing: String,
     experienceInManagingStore: String,
     gender: String,
-
+    shadualeTime: String,
     qualification: String,
 
     approvalLetter: String,
@@ -352,9 +352,7 @@ app.post("/api/submit", async (req, res) => {
     res.status(500).send("Failed to save form data");
   }
 });
-
 app.post("/api/editSave/:id", async (req, res) => {
- 
   const { id } = req.params;
   try {
     await Form.findByIdAndUpdate(id, req.body);
@@ -375,7 +373,7 @@ app.post("/api/login", async (req, res) => {
           userId: email,
           password: password,
         });
- 
+
         if (user) {
           return res.status(200).json({ role: "excutive", id: user._id });
         }
@@ -418,7 +416,7 @@ app.post(`/api/leads`, async (req, res) => {
       if (data.permissions.blocked) {
         return res.status(200).json({ leads: [], permissions: {} });
       }
-       
+
       return res
         .status(200)
         .json({ leads: data.leads, permissions: data.permissions });
@@ -440,10 +438,63 @@ app.post(`/api/lead`, async (req, res) => {
     return res.status(203).json({ message: "Something went wrong" });
   }
 });
+app.post(`/api/shaduale-lead/:id`, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const leads = await ManagingUser.findById(id).populate("leads");
+    lead = leads.filer((l) => l.shadualeTime != "");
+    return res.status(200).json(lead);
+  } catch (error) {
+    return res.status(203).json({ message: "Something went wrong" });
+  }
+});
+app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
+  const { id, excutiveId, selectedDate, selectedTime } = req.body;
+
+  if (!id || !excutiveId) {
+    return res.status(400).json({ message: "Your Are Not Excutive !" });
+  }
+
+  if (!selectedDate || !selectedTime) {
+    return res
+      .status(400)
+      .json({ message: "Please Slectect a Valid Time zone!" });
+  }
+
+  try {
+    // Find the executive and populate leads
+    const allLeadsForCurrentExcutive = await ManagingUser.findById(
+      excutiveId
+    ).populate("leads");
+
+    // Check if the selected date and time are already booked
+    const isTimeBooked = allLeadsForCurrentExcutive.leads.some(
+      (lead) => lead.shadualeTime === `${selectedDate} - ${selectedTime}`
+    );
+
+    if (isTimeBooked) {
+      return res.status(201).json({
+        message: "This time is already booked on Data ",
+        selectedDate,
+      });
+    }
+
+    // Update the form with the new schedule time
+    await Form.findByIdAndUpdate(id, {
+      shadualeTime: `${selectedDate} - ${selectedTime}`,
+    });
+
+    return res.status(200).json({ message: "Meeting Scheduled!" });
+  } catch (error) {
+    console.error("Error updating schedule:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 app.post(`/api/lead/leadManagementStages/:id`, async (req, res) => {
   const { leadManagementStage } = req.body;
   const { id } = req.params;
- 
+
   try {
     // Update the lead's leadManagementStage field
     await Form.findByIdAndUpdate(id, {
@@ -519,7 +570,7 @@ app.post(`/api/lead/sendCancel/:id`, async (req, res) => {
 });
 app.post(`/api/lead/sendBankDetail/:id`, async (req, res) => {
   const { id } = req.params;
- 
+
   try {
     const details = await Form.findById(id);
     const bankDetails = await BankDetail.findOne();
@@ -587,7 +638,6 @@ app.post(
         message: `Agreemrnt File Sent Successfully! to ${details.name}`,
       });
     } catch (error) {
-      
       return res.status(500).json({ message: "Something went wrong" });
     }
   }
@@ -611,7 +661,6 @@ app.post(`/api/lead/sendPO/:id`, upload.single("filePO"), async (req, res) => {
       message: `Purchase Order File Sent Successfully! to ${details.name}`,
     });
   } catch (error) {
-     
     return res.status(500).json({ message: "Something went wrong" });
   }
 });
@@ -637,7 +686,6 @@ app.post(
         message: `Aprooval Letter Sent Successfully! to ${details.name}`,
       });
     } catch (error) {
-     
       return res.status(500).json({ message: "Something went wrong" });
     }
   }
