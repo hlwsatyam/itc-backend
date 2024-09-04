@@ -8,10 +8,10 @@ const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const emailSender = require("./helpers/EmailSender");
-
+const XLSX = require("xlsx");
 // Initialize Express
 const app = express();
-
+const csvParser = require("csv-parser");
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
@@ -49,7 +49,10 @@ const formSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-
+    canLeadUpload: {
+      type: Boolean,
+      default: false,
+    },
     nameTitle: String,
     marriageStatus: String,
     leadManagementStages: { type: String, default: "New Lead" },
@@ -71,9 +74,12 @@ const formSchema = new mongoose.Schema(
     experienceInMarketing: String,
     experienceInManagingStore: String,
     gender: String,
+    leadSource: String,
     shadualeTime: String,
     qualification: String,
-
+    "available_investment_(select_one)": String,
+    "preferred_franchisee_segment_(select_one)": String,
+    "preferred_business_type_(select_one)": String,
     approvalLetter: String,
     agreementLetterName: String,
     purchaseOrderLetterName: String,
@@ -119,6 +125,7 @@ const ManagingAdminUserSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+
     permissions: {
       Welcome: { type: Boolean, default: false },
       blocked: { type: Boolean, default: false },
@@ -186,6 +193,18 @@ app.post("/api/users/edit-user", async (req, res) => {
 
     res.status(200).json({ message: "User Updated Success!" });
   } catch (error) {
+    res.status(500).json({ message: "Server erroraaa." });
+  }
+});
+app.post("/api/users/delete/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    console.log( id)
+    await ManagingUser.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "User Delete Success!" });
+  } catch (error) {
+    console.log( error)
     res.status(500).json({ message: "Server erroraaa." });
   }
 });
@@ -345,7 +364,6 @@ app.post("/api/submit", async (req, res) => {
         .status(400)
         .send("Current executive has reached their lead limit. Try again.");
     }
-
     res.status(200).send("Form data saved and lead assigned successfully");
   } catch (error) {
     console.error("Error saving form data:", error);
@@ -438,11 +456,100 @@ app.post(`/api/lead`, async (req, res) => {
     return res.status(203).json({ message: "Something went wrong" });
   }
 });
+
+const uploadForXLS = multer({
+  dest: "uploads/",
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    if (ext !== ".xls" && ext !== ".xlsx") {
+      return cb(new Error("Only .xls or .xlsx files are allowed"), false);
+    }
+    cb(null, true);
+  },
+});
+
+// Route to handle file upload and data saving
+app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
+  try {
+    const filePath = req.file.path;
+    const workbook = XLSX.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+    for (const row of worksheet) {
+      const mobileNo = row.phone_number;
+      const isUserExist = await Form.findOne({ mobile: mobileNo });
+      console.log(row.city, row.platform);
+      if (!isUserExist) {
+        const form = new Form({
+          name: row.full_name,
+          mobile: row.phone_number,
+          email: row.email,
+          address: row.street_address,
+          district: row.city,
+          leadSource: row.platform,
+          "available_investment_(select_one)":
+            row["available_investment_(select_one)"],
+          "preferred_franchisee_segment_(select_one)":
+            row["preferred_franchisee_segment_(select_one)"],
+          "preferred_business_type_(select_one)":
+            row["preferred_business_type_(select_one)"],
+        });
+
+        await form.save();
+
+        const allExecutives = await ManagingUser.find({
+          "permissions.blocked": false,
+        });
+
+        if (allExecutives.length === 0) {
+          return res
+            .status(400)
+            .json({ message: "No available executives to assign the lead" });
+        }
+
+        const executiveCount = allExecutives.length;
+        lastAssignedIndex = lastAssignedIndex % executiveCount;
+        let executive = allExecutives[lastAssignedIndex];
+
+        const totalAccessibleLead = executive.leadAccessCount;
+        const totalAssignedLeadTillNow = executive.leads.length;
+
+        if (totalAccessibleLead > totalAssignedLeadTillNow) {
+          await ManagingUser.findByIdAndUpdate(
+            executive._id,
+            { $push: { leads: form._id } },
+            { new: true }
+          );
+          lastAssignedIndex++;
+        } else {
+          lastAssignedIndex++;
+          return res.status(400).json({
+            message:
+              "Current executive has reached their lead limit. Try again.",
+          });
+        }
+      }
+    }
+
+    res.status(200).json({ message: "Leads saved and assigned successfully" });
+  } catch (error) {
+    console.error("Error processing file:", error);
+    res.status(500).json({ message: "Error processing file", error });
+  } finally {
+    fs.unlinkSync(req.file.path);
+  }
+});
+
 app.post(`/api/shaduale-lead/:id`, async (req, res) => {
   const { id } = req.params;
   try {
     const leads = await ManagingUser.findById(id).populate("leads");
-    lead = leads.filer((l) => l.shadualeTime != "");
+    const lead = leads.filer((l) => l.shadualeTime != "");
     return res.status(200).json(lead);
   } catch (error) {
     return res.status(203).json({ message: "Something went wrong" });
