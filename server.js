@@ -799,7 +799,7 @@ app.post(
 );
 
 app.get("/api", async (req, res) => {
-  return res.send("Hello latest vps");
+  return res.send("Hello latest vps js");
 });
 
 app.post("/api/bank-details", async (req, res) => {
