@@ -49,10 +49,7 @@ const formSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    canLeadUpload: {
-      type: Boolean,
-      default: false,
-    },
+
     nameTitle: String,
     marriageStatus: String,
     leadManagementStages: { type: String, default: "New Lead" },
@@ -125,7 +122,10 @@ const ManagingAdminUserSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-
+    canLeadUpload: {
+      type: Boolean,
+      default: false,
+    },
     permissions: {
       Welcome: { type: Boolean, default: false },
       blocked: { type: Boolean, default: false },
@@ -146,13 +146,21 @@ const ManagingUser = mongoose.model(
 );
 app.use("/static", express.static(path.join(__dirname, "public")));
 app.post("/api/users/add", async (req, res) => {
-  const { userId, name, password, leadAccessCount, permissions } = req.body;
+  const {
+    userId,
+    canLeadUpload,
+    name,
+    password,
+    leadAccessCount,
+    permissions,
+  } = req.body;
 
   try {
     const newUser = new ManagingUser({
       userId,
       name,
       password,
+      canLeadUpload,
       leadAccessCount,
       permissions,
     });
@@ -199,12 +207,12 @@ app.post("/api/users/edit-user", async (req, res) => {
 app.post("/api/users/delete/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    console.log( id)
+    console.log(id);
     await ManagingUser.findByIdAndDelete(id);
 
     res.status(200).json({ message: "User Delete Success!" });
   } catch (error) {
-    console.log( error)
+    console.log(error);
     res.status(500).json({ message: "Server erroraaa." });
   }
 });
@@ -475,6 +483,17 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
   }
 
   try {
+    if (req.body.isExcutiveMode) {
+      const managingUser = await ManagingUser.findById(req.body.isExcutiveMode);
+      if ( 
+        !managingUser ||
+        managingUser.permissions.blocked ||
+        !managingUser.canLeadUpload
+      ) {
+        return res.status(203).json({ message: "Unauthorized" });
+      }
+    }
+
     const filePath = req.file.path;
     const workbook = XLSX.readFile(filePath);
     const sheetName = workbook.SheetNames[0];
