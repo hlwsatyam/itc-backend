@@ -74,6 +74,10 @@ const formSchema = new mongoose.Schema(
     gender: String,
     leadSource: String,
     shadualeTime: String,
+    isSomethingChange: {
+      type: Boolean,
+      default: false,
+    },
     qualification: String,
     "available_investment_(select_one)": String,
     "preferred_franchisee_segment_(select_one)": String,
@@ -89,12 +93,34 @@ const formSchema = new mongoose.Schema(
     pincode: String,
     disctict: String,
     state: String,
+    junkLeadTimer: {
+      type: mongoose.Schema.Types.Mixed, // Holds the timeout reference
+      default: null,
+    },
     postOffice: String,
   },
   { timestamps: true }
 );
 
 const Form = mongoose.model("Form", formSchema);
+
+const removeOldJunkLeads = async () => {
+  try {
+    const deletedLeads = await Form.deleteMany({
+      leadManagementStages: "Junk Lead", // Remove if marked as Junk Lead more than 10 seconds ago
+    });
+    if (deletedLeads.deletedCount > 0) {
+      console.log(
+        `${deletedLeads.deletedCount} Junk Leads deleted after 6000 seconds`
+      );
+    }
+  } catch (error) {
+    console.error("Error deleting old junk leads:", error);
+  }
+};
+
+// Run the cleanup every second
+setInterval(removeOldJunkLeads, 60000);
 
 const BankDetailSchema = new mongoose.Schema({
   bankName: { type: String, required: true },
@@ -177,7 +203,7 @@ app.post("/api/users/add", async (req, res) => {
       res.status(500).json({ message: "Server error." });
     }
   }
-}); 
+});
 app.get("/api/users/all-user", async (req, res) => {
   try {
     const user = await ManagingUser.find();
@@ -199,7 +225,7 @@ app.get("/api/users/:id", async (req, res) => {
 });
 app.post("/api/users/save/:id", async (req, res) => {
   const { id } = req.params;
-  try {   
+  try {
     await ManagingUser.findByIdAndUpdate(id, req.body);
 
     res.status(200).json({ message: "User Updated Success!" });
@@ -384,7 +410,7 @@ app.post("/api/submit", async (req, res) => {
 app.post("/api/editSave/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    await Form.findByIdAndUpdate(id, req.body);
+    await Form.findByIdAndUpdate(id, { ...req.body, isSomethingChange: true });
     res.status(200).json({ message: "Form data Updated successfully" });
   } catch (error) {
     res.status(500).send("Failed to save form data");
@@ -486,16 +512,16 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
   }
 
   try {
-    if (req.body.isExcutiveMode) {
-      const managingUser = await ManagingUser.findById(req.body.isExcutiveMode);
-      if (
-        !managingUser ||
-        managingUser.permissions.blocked ||
-        !managingUser.canLeadUpload
-      ) {
-        return res.status(203).json({ message: "Unauthorized" });
-      }
-    }
+    // if (req.body.isExcutiveMode) {
+    //   const managingUser = await ManagingUser.findById(req.body.isExcutiveMode);
+    //   if (
+    //     !managingUser ||
+    //     managingUser.permissions.blocked ||
+    //     !managingUser.canLeadUpload
+    //   ) {
+    //     return res.status(203).json({ message: "Unauthorized" });
+    //   }
+    // }
 
     const filePath = req.file.path;
     const workbook = XLSX.readFile(filePath);
@@ -530,7 +556,7 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
 
         if (allExecutives.length === 0) {
           return res
-            .status(400)
+            .status(201)
             .json({ message: "No available executives to assign the lead" });
         }
 
@@ -550,7 +576,7 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
           lastAssignedIndex++;
         } else {
           lastAssignedIndex++;
-          return res.status(400).json({
+          return res.status(201).json({
             message:
               "Current executive has reached their lead limit. Try again.",
           });
@@ -635,6 +661,7 @@ app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
     await Form.findByIdAndUpdate(id, {
       shadualeTime: newShadualeTime,
       shadualedMesage,
+      isSomethingChange: true,
       shaduleDateCount,
     });
 
@@ -652,6 +679,7 @@ app.post(`/api/lead/leadManagementStages/:id`, async (req, res) => {
     // Update the lead's leadManagementStage field
     await Form.findByIdAndUpdate(id, {
       leadManagementStages: leadManagementStage,
+      isSomethingChange: true,
     });
     return res.status(200).json({ message: "Updated" });
   } catch (error) {
@@ -696,6 +724,39 @@ app.post(`/api/leads/:query`, async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 });
+app.post(`/api/lead/excutive/:query`, async (req, res) => {
+  const { query } = req.params;
+  const { id } = req.body;
+
+  try {
+    // Find the managing user by their ID and retrieve the leads they are assigned to
+    const managingUser = await ManagingUser.findById(id).populate("leads");
+
+    if (!managingUser) {
+      return res.status(404).json({ message: "Managing user not found" });
+    }
+
+    // Search only within the user's assigned leads
+    const leads = await Form.find({
+      _id: { $in: managingUser.leads }, // Filter by the assigned lead IDs
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { mobile: { $regex: query, $options: "i" } },
+        { email: { $regex: query, $options: "i" } },
+        { leadManagementStages: { $regex: query, $options: "i" } },
+      ],
+    });
+
+    return res.status(200).json({
+      leads,
+      permissions: managingUser.permissions,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
 app.post(`/api/lead/delete/:id`, async (req, res) => {
   const { id } = req.params;
   try {
@@ -709,7 +770,9 @@ app.post(`/api/lead/delete/:id`, async (req, res) => {
 app.post(`/api/lead/sendWelcome/:id`, async (req, res) => {
   const { id } = req.params;
   try {
-    const details = await Form.findById(id);
+    const details = await Form.findByIdAndUpdate(id, {
+      isSomethingChange: true,
+    });
     await emailSender.welcomeEmail(details.email, details.mobile, details.name);
     return res
       .status(200)
@@ -734,7 +797,9 @@ app.post(`/api/lead/sendBankDetail/:id`, async (req, res) => {
   const { id } = req.params;
 
   try {
-    const details = await Form.findById(id);
+    const details = await Form.findByIdAndUpdate(id, {
+      isSomethingChange: true,
+    });
     const bankDetails = await BankDetail.findOne();
     await emailSender.bankDetailShareEmail(
       details.email,
@@ -786,6 +851,7 @@ app.post(
       const details = await Form.findByIdAndUpdate(id, {
         approval: true,
         agreementLetterName: req.file.filename,
+        isSomethingChange: true,
       });
 
       await emailSender.agreementEmail(
@@ -809,6 +875,7 @@ app.post(`/api/lead/sendPO/:id`, upload.single("filePO"), async (req, res) => {
   try {
     const details = await Form.findByIdAndUpdate(id, {
       purchaseOrderLetterName: req.file.filename,
+      isSomethingChange: true,
     });
 
     await emailSender.POEmail(
@@ -834,6 +901,7 @@ app.post(
     try {
       const details = await Form.findByIdAndUpdate(id, {
         approvalLetter: req.file.filename,
+        isSomethingChange: true,
       });
 
       await emailSender.aproovalEmail(
