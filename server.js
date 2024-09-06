@@ -56,6 +56,7 @@ const formSchema = new mongoose.Schema(
     address: String,
     businessName: String,
     businessAddress: String,
+    shadualedMesage: String,
     gst: String,
     fssai: String,
     businessType: String,
@@ -84,6 +85,7 @@ const formSchema = new mongoose.Schema(
     email: String,
     address: String,
     area: String,
+    shaduleDateCount: Number,
     pincode: String,
     disctict: String,
     state: String,
@@ -175,7 +177,7 @@ app.post("/api/users/add", async (req, res) => {
       res.status(500).json({ message: "Server error." });
     }
   }
-});
+}); 
 app.get("/api/users/all-user", async (req, res) => {
   try {
     const user = await ManagingUser.find();
@@ -195,9 +197,10 @@ app.get("/api/users/:id", async (req, res) => {
     res.status(500).json({ message: "Server erroraaa." });
   }
 });
-app.post("/api/users/edit-user", async (req, res) => {
-  try {
-    await ManagingUser.findByIdAndUpdate(req.body._id, req.body);
+app.post("/api/users/save/:id", async (req, res) => {
+  const { id } = req.params;
+  try {   
+    await ManagingUser.findByIdAndUpdate(id, req.body);
 
     res.status(200).json({ message: "User Updated Success!" });
   } catch (error) {
@@ -485,7 +488,7 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
   try {
     if (req.body.isExcutiveMode) {
       const managingUser = await ManagingUser.findById(req.body.isExcutiveMode);
-      if ( 
+      if (
         !managingUser ||
         managingUser.permissions.blocked ||
         !managingUser.canLeadUpload
@@ -574,46 +577,70 @@ app.post(`/api/shaduale-lead/:id`, async (req, res) => {
     return res.status(203).json({ message: "Something went wrong" });
   }
 });
+// app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
+//   const { id, excutiveId, selectedDate, selectedTime } = req.body;
+//   if (!id || !excutiveId) {
+//     return res.status(400).json({ message: "Your Are Not Excutive !" });
+//   }
+//   if (!selectedDate || !selectedTime) {
+//     return res
+//       .status(400)
+//       .json({ message: "Please Slectect a Valid Time zone!" });
+//   }
+//   try {
+//     // Find the executive and populate leads
+//     const allLeadsForCurrentExcutive = await ManagingUser.findById(
+//       excutiveId
+//     ).populate("leads");
+//     // Check if the selected date and time are already booked
+//     const isTimeBooked = allLeadsForCurrentExcutive.leads.some(
+//       (lead) => lead.shadualeTime === `${selectedDate} + ${selectedTime}`
+//     );
+//     if (isTimeBooked) {
+//       return res.status(201).json({
+//         message: "This time is already booked on Data ",
+//         selectedDate,
+//       });
+//     }
+//     // Update the form with the new schedule time
+//     await Form.findByIdAndUpdate(id, {
+//       shadualeTime: `${selectedDate} + ${selectedTime}`,
+//     });
+//     return res.status(200).json({ message: "Meeting Scheduled!" });
+//   } catch (error) {
+//     console.error("Error updating schedule:", error);
+//     return res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
 app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
-  const { id, excutiveId, selectedDate, selectedTime } = req.body;
+  const { id, excutiveId, shaduleDateCount, shadualedMesage, selectedDate } =
+    req.body;
 
+  // Validate input
   if (!id || !excutiveId) {
-    return res.status(400).json({ message: "Your Are Not Excutive !" });
+    return res.status(400).json({ message: "You Are Not Authorized!" });
   }
-
-  if (!selectedDate || !selectedTime) {
+  if (!selectedDate) {
     return res
       .status(400)
-      .json({ message: "Please Slectect a Valid Time zone!" });
+      .json({ message: "Please Select a Valid Time Zone!" });
   }
 
   try {
-    // Find the executive and populate leads
-    const allLeadsForCurrentExcutive = await ManagingUser.findById(
-      excutiveId
-    ).populate("leads");
+    // Build the new shadualeTime string
+    const newShadualeTime = `${selectedDate}`;
 
-    // Check if the selected date and time are already booked
-    const isTimeBooked = allLeadsForCurrentExcutive.leads.some(
-      (lead) => lead.shadualeTime === `${selectedDate} - ${selectedTime}`
-    );
-
-    if (isTimeBooked) {
-      return res.status(201).json({
-        message: "This time is already booked on Data ",
-        selectedDate,
-      });
-    }
-
-    // Update the form with the new schedule time
+    // Update the lead with the new schedule time
     await Form.findByIdAndUpdate(id, {
-      shadualeTime: `${selectedDate} - ${selectedTime}`,
+      shadualeTime: newShadualeTime,
+      shadualedMesage,
+      shaduleDateCount,
     });
 
     return res.status(200).json({ message: "Meeting Scheduled!" });
   } catch (error) {
-    console.error("Error updating schedule:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
@@ -642,7 +669,16 @@ app.get(`/api/leadById/:id`, async (req, res) => {
     return res.status(203).json({ message: "Something went wrong" });
   }
 });
-
+app.get(`/api/lead/get-shadualeTime/:id`, async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const lead = await Form.findById(id);
+    return res.status(200).json({ message: lead.shadualedMesage });
+  } catch (error) {
+    return res.status(203).json({ message: "Something went wrong" });
+  }
+});
 app.post(`/api/leads/:query`, async (req, res) => {
   const { query } = req.params;
 
