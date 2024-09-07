@@ -97,6 +97,7 @@ const formSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed, // Holds the timeout reference
       default: null,
     },
+
     postOffice: String,
   },
   { timestamps: true }
@@ -489,6 +490,21 @@ app.post(`/api/lead`, async (req, res) => {
   try {
     const leads = await Form.findOne({ mobile });
     return res.status(200).json(leads);
+  } catch (error) {
+    return res.status(203).json({ message: "Something went wrong" });
+  }
+});
+app.post(`/api/leadFromAdmin`, async (req, res) => {
+  const { id, excutiveID, isAdminClicked } = req.body;
+  try {
+    let permissions;
+    if (excutiveID || !isAdminClicked) {
+      permissions = await ManagingUser.findById(excutiveID);
+    }
+    const leads = await Form.findById(id);
+    return res
+      .status(200)
+      .json({ leads, permissions: permissions?.permissions });
   } catch (error) {
     return res.status(203).json({ message: "Something went wrong" });
   }
