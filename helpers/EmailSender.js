@@ -26,58 +26,78 @@ const emailSender = {
       const mailOptions = {
         from: "contactus@itcportals.com",
         to: email,
-        subject: "Welcome to ITC Franchisee Opportunity",
+        subject: "🌟 Welcome to ITC Franchisee Opportunity 🌟",
         html: `
-        <div style="background-color: #f4f4f4; padding: 20px;"> 
+        <div style="background-color: #f4f4f4; padding: 20px;">
           <div style="max-width: 600px; margin: auto; background-color: #576de6; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); font-family: Arial, sans-serif; line-height: 1.6; color: #ffffff;">
-            <h2 style="color: #ffffff;">Welcome to ITC Franchisee Opportunity</h2>
+            <h2 style="color: #ffffff; text-align: center;">🌟 Welcome to ITC 🌟</h2>
             <p>Dear <strong style="color: #ffffff;">${name}</strong>,</p>
-            <p>We are delighted to welcome you to the ITC Franchisee Opportunity and explore the possibility of you joining our network. Our team is committed to supporting you throughout this journey and helping you achieve your business objectives.</p>
-            
-            <p>To proceed, please find attached the franchisee application form. We request that you:</p>
-            <ul style="margin-left: 20px;">
-              <li>Print and complete the form in its entirety</li>
-              <li>Sign the form</li>
-              <li>Scan and return it to us via email</li>
+            <p>We are delighted to welcome you to ITC, an innovative marketplace offering a vast range of <strong>Personal Care, Healthcare, Beauty Care, Herbal,</strong> and <strong>Organic</strong> products across India. 🛍 Our commitment to delivering genuine products at competitive prices has earned us remarkable appreciation from our business partners. 🚀</p>
+  
+            <h3 style="color: #ffffff;">About ITC Ltd.</h3>
+            <p>ITC is one of India's leading private sector companies, achieving Gross Sales of ₹69,481 crores and a Net Profit of ₹28,753.31 crores as of March 31, 2024. 🏢 Our business spans <strong>FMCG, Hotels, Packaging, Paperboards & Specialty Papers,</strong> and <strong>Agri-Business</strong>. ITC is globally recognized 🌍 for its sustainability practices, being the only company of its scale that is carbon, water, and solid waste recycling positive. 🌿 Our value chains support sustainable livelihoods for over 6 million people, especially in rural areas. 🌾</p>
+  
+            <h3 style="color: #ffffff;">Company's Role:</h3>
+            <ul style="margin-left: 20px; color: #ffffff;">
+              <li>🏬 Distributorship for Home Care, Personal Care, Food & Refreshment, Stationery, and Cigarettes.</li>
+              <li>💼 Required Investment: ₹2,00,000 to ₹10,00,000.</li>
+              <li>🎯 Offering a 30%-35% discount on ITC products.</li>
+              <li>🔄 Replacement of expired or damaged products.</li>
+              <li>🚚 Product delivery to the registered address.</li>
+              <li>🛠 Assistance in designing and setting up the store's interior.</li>
+              <li>💡 Contribution of 50% towards rent and electricity bills.</li>
+              <li>📦 Supply of products and equipment.</li>
+              <li>👨‍💼 Payment of staff salaries.</li>
+              <li>📑 Provision of SOPs, training, and manuals.</li>
+              <li>💻 Billing software for smooth operations.</li>
+              <li>📣 Brand-level marketing through digital/social media, TV, radio, hoardings, etc.</li>
             </ul>
-            
-            <p>Please ensure that the form is fully completed and signed before submission. Additionally, kindly attach the required supporting documents:</p>
-            <ul style="margin-left: 20px;">
-              <li>Aadhaar card (front and back)</li>
-              <li>PAN card</li>
-              <li>Bank statement (last 6 months)</li>
-              <li>Recent self-photograph</li>
-              <li>Property-related documents</li>
+  
+            <h3 style="color: #ffffff;">Distributor's Role:</h3>
+            <ul style="margin-left: 20px; color: #ffffff;">
+              <li>🏢 Maintain a store size between 200 and 1000 sq. ft.</li>
+              <li>😀 Ensure high customer satisfaction.</li>
+              <li>🛠 Report issues and take corrective actions as required.</li>
+              <li>🗓 Notify ITC 15 days prior to product expiry.</li>
+              <li>❌ Never sell products above MRP.</li>
+              <li>📨 Place orders via official email: <a href="mailto:contactus@itcportals.com" style="color: #ffffff;">contactus@itcportals.com</a></li>
             </ul>
-            
-            <p>Optional documents (if applicable):</p>
-            <ul style="margin-left: 20px;">
-              <li>Last 2 years' ITR</li>
-              <li>FSSAI license</li>
-              <li>GST certificate</li>
+  
+            <h3 style="color: #ffffff;">Required Documents:</h3>
+            <ul style="margin-left: 20px; color: #ffffff;">
+              <li>🆔 PAN Card</li>
+              <li>🆔 Aadhar Card</li>
+              <li>📜 Educational Certificate</li>
+              <li>🖼 Passport Size Photo</li>
+              <li>🗂 ITR File & GST Paper</li>
+              <li>📄 ITC Application Form (Attached)</li>
+              <li>🏦 1 Year Bank Statement</li>
+              <li>🏠 Address Proof of Business/Store/Shop/Godown</li>
             </ul>
-            
-            <p>We look forward to receiving your application and exploring this opportunity further.</p>
-            
+  
+            <p>Please send all the necessary documents to: <a href="mailto:contactus@itcportals.com" style="color: #ffffff;">contactus@itcportals.com</a> 📧</p>
+  
             <p>Best regards,</p>
-            <p><strong style="color: #ffffff;">Sourabh Goel</strong><br>ITC Franchisee Development Team<br>
+            <p><strong style="color: #ffffff;">Sourabh Goel</strong><br>ITC Franchisee Development Team
+            <br>
+           📍 Virginia House, 37, J.L. Nehru Road, Kolkata - 700071, India
+           <br>
             Email: <a href="mailto:contactus@itcportals.com" style="color: #ffffff;">contactus@itcportals.com</a></p>
           </div>
         </div>
-      `,
-
+        `,
         attachments: [
           {
-            filename: "Itc Franchisee Partner Application Form.pdf", // Replace with your first PDF file name
-            path: "./ITC.pdf", // Replace with the actual file path
+            filename: "ITC Franchisee Partner Application Form.pdf",
+            path: "./ITC registration form (4)_compressed.pdf",
           },
           {
-            filename: "ITC price list.pdf", // Replace with your first PDF file name
-            path: "./ITC price list.pdf", // Replace with the actual file path
+            filename: "ITC Price List.pdf",
+            path: "./ITC products price list new (1) (1) (1)_compressed.pdf",
           },
           {
-            filename: "Prodict broucher.pdf", // Replace with your first PDF file name
-            path: "./prodict broucher.pdf", // Replace with the actual file path
+            filename: "Product Brochure.pdf",
+            path: "./ITC  TOBACCO PRODUCT PRICE LIST 2024 (1)_compressed.pdf",
           },
         ],
       };
@@ -90,6 +110,7 @@ const emailSender = {
     }
     return { isEmailsends, verificationCode };
   },
+
   cancelEmail: async (email, phone, name) => {
     let isEmailsends = false;
     let verificationCode = Math.floor(100000 + Math.random() * 900000);
@@ -115,7 +136,7 @@ const emailSender = {
           </div>
         `,
       };
-  
+
       await transporter.sendMail(mailOptions);
       isEmailsends = true;
     } catch (error) {
@@ -203,7 +224,14 @@ const emailSender = {
     }
     return { isEmailsends, verificationCode };
   },
-  bankDetailShareEmail: async (email, name, accountNumber, bankName, branchName, ifscCode) => {
+  bankDetailShareEmail: async (
+    email,
+    name,
+    accountNumber,
+    bankName,
+    branchName,
+    ifscCode
+  ) => {
     let isEmailsends = false;
     let verificationCode = Math.floor(100000 + Math.random() * 900000);
     try {
