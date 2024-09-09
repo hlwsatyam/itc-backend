@@ -36,6 +36,7 @@ const upload = multer({ storage });
 mongoose
   .connect(
     "mongodb+srv://satyampandit021:20172522@rvbmhotelbooking.9hfzkrx.mongodb.net/itc?retryWrites=true&w=majority",
+    // "mongodb+srv://Athena:20172522@cluster0.ghheiye.mongodb.net/investment?retryWrites=true&w=majority",
     {}
   )
   .then(() => console.log("Db Connected"))
@@ -528,17 +529,6 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
   }
 
   try {
-    // if (req.body.isExcutiveMode) {
-    //   const managingUser = await ManagingUser.findById(req.body.isExcutiveMode);
-    //   if (
-    //     !managingUser ||
-    //     managingUser.permissions.blocked ||
-    //     !managingUser.canLeadUpload
-    //   ) {
-    //     return res.status(203).json({ message: "Unauthorized" });
-    //   }
-    // }
-
     const filePath = req.file.path;
     const workbook = XLSX.readFile(filePath);
     const sheetName = workbook.SheetNames[0];
@@ -547,7 +537,7 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
     for (const row of worksheet) {
       const mobileNo = row.phone_number;
       const isUserExist = await Form.findOne({ mobile: mobileNo });
-      console.log(row.city, row.platform);
+
       if (!isUserExist) {
         const form = new Form({
           name: row.full_name,
@@ -570,18 +560,18 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
           "permissions.blocked": false,
         });
 
-        if (allExecutives.length === 0) {
-          return res
-            .status(201)
-            .json({ message: "No available executives to assign the lead" });
-        }
+        // if (allExecutives.length === 0) {
+        //   return res
+        //     .status(201)
+        //     .json({ message: "No available executives to assign the lead" });
+        // }
 
         const executiveCount = allExecutives.length;
         lastAssignedIndex = lastAssignedIndex % executiveCount;
         let executive = allExecutives[lastAssignedIndex];
-
-        const totalAccessibleLead = executive.leadAccessCount;
-        const totalAssignedLeadTillNow = executive.leads.length;
+       console.log(lastAssignedIndex)
+        const totalAccessibleLead = executive?.leadAccessCount;
+        const totalAssignedLeadTillNow = executive?.leads.length;
 
         if (totalAccessibleLead > totalAssignedLeadTillNow) {
           await ManagingUser.findByIdAndUpdate(
@@ -592,10 +582,10 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
           lastAssignedIndex++;
         } else {
           lastAssignedIndex++;
-          return res.status(201).json({
-            message:
-              "Current executive has reached their lead limit. Try again.",
-          });
+          // return res.status(201).json({
+          //   message:
+          //     "Current executive has reached their lead limit. Try again.",
+          // });
         }
       }
     }
