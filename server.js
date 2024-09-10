@@ -32,16 +32,21 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Connect to MongoDB
-
-mongoose
-  .connect(
-    "mongodb+srv://satyampandit021:20172522@rvbmhotelbooking.9hfzkrx.mongodb.net/itc?retryWrites=true&w=majority",
-    // "mongodb+srv://Athena:20172522@cluster0.ghheiye.mongodb.net/investment?retryWrites=true&w=majority",
-    {}
-  )
-  .then(() => console.log("Db Connected"))
-  .catch((err) => console.log(err));
-
+const db = async () => {
+  try {
+    await mongoose
+      .connect(
+        "mongodb+srv://satyampandit021:20172522@rvbmhotelbooking.9hfzkrx.mongodb.net/itc?retryWrites=true&w=majority",
+        // "mongodb+srv://Athena:20172522@cluster0.ghheiye.mongodb.net/investment?retryWrites=true&w=majority",
+        {}
+      )
+      .then(() => console.log("Db Connected"))
+      .catch((err) => console.log(err));
+  } catch (e) {
+    console.log(e)
+  }
+}
+db();
 const formSchema = new mongoose.Schema(
   {
     name: String,
@@ -122,7 +127,7 @@ const removeOldJunkLeads = async () => {
 };
 
 // Run the cleanup every second
-setInterval(removeOldJunkLeads, 60000);
+// setInterval(removeOldJunkLeads, 60000);
 
 const BankDetailSchema = new mongoose.Schema({
   bankName: { type: String, required: true },
@@ -361,6 +366,13 @@ app.post("/api/submit", async (req, res) => {
   const formData = new Form(req.body);
 
   try {
+    const isUserAlreadyGFilledForm = await Form.findOne({ mobile: req.body.mobile })
+    if (isUserAlreadyGFilledForm) {
+
+      return res.status(203).json({ message: "You are Already Filled This Form! Go To 'check Status' To check Details" });
+
+    }
+
     // Save form data to the database
     await formData.save();
 
@@ -368,11 +380,6 @@ app.post("/api/submit", async (req, res) => {
     const allExecutives = await ManagingUser.find({
       "permissions.blocked": false,
     });
-
-    // If there are no available executives, send an error response
-    if (allExecutives.length === 0) {
-      return res.status(400).send("No available executives to assign the lead");
-    }
 
     // Calculate the index of the next executive in sequence
     const executiveCount = allExecutives.length;
@@ -383,8 +390,8 @@ app.post("/api/submit", async (req, res) => {
     // Assign the lead to the next executive in the sequence
     const executive = allExecutives[lastAssignedIndex];
 
-    const totalAccessibleLead = executive.leadAccessCount;
-    const totalAssignedLeadTillNow = executive.leads.length;
+    const totalAccessibleLead = executive?.leadAccessCount;
+    const totalAssignedLeadTillNow = executive?.leads.length;
 
     // Check if the executive can take more leads
     if (totalAccessibleLead > totalAssignedLeadTillNow) {
@@ -399,14 +406,12 @@ app.post("/api/submit", async (req, res) => {
     } else {
       // If the current executive cannot take more leads, increment index and try next
       lastAssignedIndex++;
-      return res
-        .status(400)
-        .send("Current executive has reached their lead limit. Try again.");
+
     }
-    res.status(200).send("Form data saved and lead assigned successfully");
+    res.status(200).json({ message: "Form Filled successfully! We Will Contact You Shortly!" });
   } catch (error) {
-    console.error("Error saving form data:", error);
-    res.status(500).send("Failed to save form data");
+
+    res.status(203).json({ messsage: error?.message });
   }
 });
 app.post("/api/editSave/:id", async (req, res) => {
@@ -435,7 +440,7 @@ app.post("/api/login", async (req, res) => {
           return res.status(200).json({ role: "excutive", id: user._id });
         }
 
-        return res.status(401).json({ error: "Invalid admin credentials" });
+        return res.status(203).json({ message: "Invalid admin credentials" });
       }
     }
 
@@ -446,18 +451,18 @@ app.post("/api/login", async (req, res) => {
         if (user) {
           return res.status(200).json({ role: "customer" });
         } else {
-          return res.status(401).json({ error: "Customer not found" });
+          return res.status(203).json({ message: "Customer not found" });
         }
       } else {
-        return res.status(401).json({ error: "Invalid password for customer" });
+        return res.status(203).json({ message: "Invalid password for customer" });
       }
     }
 
     // Handle cases where the role is neither 'admin' nor 'customer'
-    return res.status(400).json({ error: "Invalid role" });
+    return res.status(203).json({ message: "Invalid role" });
   } catch (error) {
     console.error(error); // Log the error for debugging
-    res.status(500).send("An error occurred during login");
+    res.status(203).json({ message: "An error occurred during login" });
   }
 });
 
@@ -569,7 +574,7 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
         const executiveCount = allExecutives.length;
         lastAssignedIndex = lastAssignedIndex % executiveCount;
         let executive = allExecutives[lastAssignedIndex];
-       console.log(lastAssignedIndex)
+        console.log(lastAssignedIndex)
         const totalAccessibleLead = executive?.leadAccessCount;
         const totalAssignedLeadTillNow = executive?.leads.length;
 

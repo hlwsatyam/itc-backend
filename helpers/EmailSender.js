@@ -74,10 +74,10 @@ const emailSender = {
               <li>🏦 1 Year Bank Statement</li>
               <li>🏠 Address Proof of Business/Store/Shop/Godown</li>
             </ul>
-  
             <p>Please send all the necessary documents to: <a href="mailto:contactus@itcportals.com" style="color: #ffffff;">contactus@itcportals.com</a> 📧</p>
-  
+
             <p>Best regards,</p>
+
             <p><strong style="color: #ffffff;">Sourabh Goel</strong><br>ITC Franchisee Development Team
             <br>
            📍 Virginia House, 37, J.L. Nehru Road, Kolkata - 700071, India
@@ -110,7 +110,6 @@ const emailSender = {
     }
     return { isEmailsends, verificationCode };
   },
-
   cancelEmail: async (email, phone, name) => {
     let isEmailsends = false;
     let verificationCode = Math.floor(100000 + Math.random() * 900000);
@@ -317,5 +316,5 @@ const emailSender = {
     return { isEmailsends, verificationCode };
   },
 };
-
+ 
 module.exports = emailSender;
