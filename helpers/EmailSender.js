@@ -246,7 +246,7 @@ const emailSender = {
                  
                 </ul>
     
-                <h2>Preferred or Available Locations</h2>
+                <h2>Preferred or Available Locations:</h2>
                 <p>We are currently seeking franchisees in the following locations on an urgent basis:</p>
              
   <ul>
