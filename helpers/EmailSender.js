@@ -124,7 +124,7 @@ const emailSender = {
           <head>
             <style>
               body {
-                font-family: Arial, sans-serif;
+                font-family: ui-monospace;
                 background-color: #f9f9f9;
                 color: #333333;
                 margin: 0;
@@ -232,16 +232,32 @@ const emailSender = {
                   <li>Recent Self-Photograph</li>
                   <li>Property-related Documents</li>
                 </ul>
+                <h2>Optional Documents (if applicable):</h2>
+                <ul>
+                  <li>Last 2 years' ITR</li>
+                  <li>FSSAI License</li>
+                  <li>GST Certificate</li>    
+                </ul>
+                <h2>Space Required:</h2>
+                <ul>
+                  <li>Office: 150 to 200 Square Feet</li>
+                  <li>Godown: 1500 to 2000 Square Feet</li>
+                  <li>Other Space: 200 to 400 Square Feet</li>
+                 
+                </ul>
     
                 <h2>Preferred or Available Locations</h2>
                 <p>We are currently seeking franchisees in the following locations on an urgent basis:</p>
-                <ul>
-                  <li>${selectedPostOffices}</li>
-                </ul>
-    
+             
+  <ul>
+    ${selectedPostOffices?.map((e, index) => `<li key="${index}">${e}</li>`).join('')}
+  </ul>
+ 
+
+     
                 <p>Attached to this email, you will find the ITC franchisee application form, product price list, and other relevant documents. Kindly print and fill out the application form, attach the necessary documents, and reply to this email with your completed form and attachments.</p>
     
-                <h2>Common Questions from Leads</h2>
+                <h2>FAQ</h2>
                 <ul>
                   <li><strong>Office Location:</strong> Our office is located at Virginia House, 37, J.L. Nehru Road, Kolkata - 700071, India.</li>
                   <li><strong>Verification of ITC Affiliation:</strong> I will send you an email through the ITC portal from our official email ID: contactus@itcportals.com.</li>
@@ -251,7 +267,7 @@ const emailSender = {
     
                 <p>Thank you for your interest in partnering with ITC Limited. If you have any further questions or need assistance with the application process, feel free to reply to this email.</p>
     
-                <p><a href="mailto:contactus@itcportals.com" class="button">Contact Us</a></p>
+                <p><a href="tel:+917209058182" class="button">Call Now</a></p>
     
               </div>
               <div class="footer">
@@ -271,11 +287,11 @@ const emailSender = {
           },
           {
             filename: "ITC Price List.pdf",
-            path: "./ITC price list.pdf",
+            path: "./ITC products price list new (1) (1) (1).pdf",
           },
           {
             filename: "Product Brochure.pdf",
-            path: "./ITC products price list new .pdf",
+            path: "./ITC  TOBACCO PRODUCT PRICE LIST 2024 (1)_compressed.pdf",
           },
         ],
       };
