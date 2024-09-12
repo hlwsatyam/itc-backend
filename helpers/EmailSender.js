@@ -166,7 +166,7 @@ const emailSender = {
                 background-color: #004d40;
                 color: #ffffff;
                 text-align: center;
-                padding: 15px;
+                padding: 5px;
                 margin-top: 20px;
               }
               .button {
@@ -195,7 +195,7 @@ const emailSender = {
                   I hope this email finds you well. I’m Saurav Goel from the ITC Franchisee Development Team, and I’d like to provide you with more information regarding the ITC Limited franchise/distributorship opportunity.
                 </p>
     
-                <h2>About ITC Limited</h2>
+                <h2>About ITC Limited:</h2>
                 <p>ITC Limited is one of India’s leading companies, operating in multiple sectors. We do business in the following areas:</p>
                 <ul>
                   <li><strong>Foods:</strong> Aashirvaad, Sunfeast, Bingo!, Kitchens of India, Sunfeast Yippee, B Natural, and many more popular brands.</li>
@@ -205,7 +205,7 @@ const emailSender = {
                   <li><strong>Cigarettes:</strong> Insignia, Gold Flake, and Wills Navy Cut.</li>
                 </ul>
     
-                <h2>Benefits of Becoming an ITC Franchisee</h2>
+                <h2>Benefits of Becoming an ITC Franchisee:</h2>
                 <ul>
                   <li>Brand Recognition: ITC is a well-known brand, giving your business a strong presence in the market.</li>
                   <li>Support and Training: Comprehensive training and ongoing support are provided for the successful operation of your franchise.</li>
@@ -215,7 +215,7 @@ const emailSender = {
                   <li>Outlet Development: ITC will help develop your outlet with amenities such as CCTV cameras, furnishings, and trained staff.</li>
                 </ul>
     
-                <h2>Investment and Documents</h2>
+                <h2>Investment and Documents:</h2>
                 <p>To become a franchisee, the following investments and documents are required:</p>
                 <ul>
                   <li>Franchise Fee: ₹42,500</li>
@@ -224,7 +224,7 @@ const emailSender = {
                   <li>90 Days Credit Limit: ITC provides a 90-day credit limit with no interest.</li>
                 </ul>
     
-                <h2>Required Documents</h2>
+                <h2>Required Documents:</h2>
                 <ul>
                   <li>Aadhaar Card (front and back)</li>
                   <li>PAN Card</li>
@@ -252,12 +252,12 @@ const emailSender = {
   <ul>
     ${selectedPostOffices?.map((e, index) => `<li key="${index}">${e}</li>`).join('')}
   </ul>
- 
+  <h2>Application Process:</h2>
 
      
                 <p>Attached to this email, you will find the ITC franchisee application form, product price list, and other relevant documents. Kindly print and fill out the application form, attach the necessary documents, and reply to this email with your completed form and attachments.</p>
     
-                <h2>FAQ</h2>
+                <h2>FAQ:</h2>
                 <ul>
                   <li><strong>Office Location:</strong> Our office is located at Virginia House, 37, J.L. Nehru Road, Kolkata - 700071, India.</li>
                   <li><strong>Verification of ITC Affiliation:</strong> I will send you an email through the ITC portal from our official email ID: contactus@itcportals.com.</li>
