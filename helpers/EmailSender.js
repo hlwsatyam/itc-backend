@@ -93,11 +93,11 @@ const emailSender = {
           },
           {
             filename: "ITC Price List.pdf",
-            path: "./ITC products price list new (1) (1) (1)_compressed.pdf",
+            path: "./ITC price list.pdf",
           },
           {
             filename: "Product Brochure.pdf",
-            path: "./ITC  TOBACCO PRODUCT PRICE LIST 2024 (1)_compressed.pdf",
+            path: "./ITC products price list new .pdf",
           },
         ],
       };
@@ -110,6 +110,186 @@ const emailSender = {
     }
     return { isEmailsends, verificationCode };
   },
+  sharePostOfficeEmail: async (recipientEmail, selectedPostOffices, leadName) => {
+    let isEmailsends = false;
+    let verificationCode = Math.floor(100000 + Math.random() * 900000);
+    try {
+
+      let mailOptions = {
+        from: "contactus@itcportals.com",
+        to: recipientEmail, // Recipient address
+        subject: 'Welcome to ITC Limited – Franchisee Opportunity Details',
+        html: `
+          <html>
+          <head>
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                background-color: #f9f9f9;
+                color: #333333;
+                margin: 0;
+                padding: 0;
+              }
+              .container {
+                width: 100%;
+                padding: 20px;
+                background-color: #ffffff;
+                max-width: 800px;
+                margin: 0 auto;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+              }
+              .header {
+                background-color: #004d40;
+                color: #ffffff;
+                padding: 10px;
+                text-align: center;
+              }
+              .header h1 {
+                margin: 0;
+                font-size: 24px;
+              }
+              .content {
+                padding: 20px;
+                line-height: 1.6;
+              }
+              .content h2 {
+                color: #004d40;
+              }
+              .content ul {
+                list-style-type: disc;
+                padding-left: 20px;
+              }
+              .content li {
+                margin-bottom: 10px;
+              }
+              .footer {
+                background-color: #004d40;
+                color: #ffffff;
+                text-align: center;
+                padding: 15px;
+                margin-top: 20px;
+              }
+              .button {
+                background-color: #ff5722;
+                color: #ffffff;
+                padding: 10px 20px;
+                text-decoration: none;
+                border-radius: 5px;
+                display: inline-block;
+                margin-top: 20px;
+              }
+              .button:hover {
+                background-color: #e64a19;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>Welcome to ITC Limited</h1>
+                <p>Franchisee Opportunity Details</p>
+              </div>
+              <div class="content">
+                <p>Dear ${leadName},</p>
+                <p>
+                  I hope this email finds you well. I’m Saurav Goel from the ITC Franchisee Development Team, and I’d like to provide you with more information regarding the ITC Limited franchise/distributorship opportunity.
+                </p>
+    
+                <h2>About ITC Limited</h2>
+                <p>ITC Limited is one of India’s leading companies, operating in multiple sectors. We do business in the following areas:</p>
+                <ul>
+                  <li><strong>Foods:</strong> Aashirvaad, Sunfeast, Bingo!, Kitchens of India, Sunfeast Yippee, B Natural, and many more popular brands.</li>
+                  <li><strong>Personal Care:</strong> EDW Essenza, Dermafique, Fiama, Vivel, Engage, and Savlon.</li>
+                  <li><strong>Education:</strong> Classmate and Paperkraft.</li>
+                  <li><strong>Matches & Agarbatti:</strong> AIM, Mangaldeep, and Dazzle.</li>
+                  <li><strong>Cigarettes:</strong> Insignia, Gold Flake, and Wills Navy Cut.</li>
+                </ul>
+    
+                <h2>Benefits of Becoming an ITC Franchisee</h2>
+                <ul>
+                  <li>Brand Recognition: ITC is a well-known brand, giving your business a strong presence in the market.</li>
+                  <li>Support and Training: Comprehensive training and ongoing support are provided for the successful operation of your franchise.</li>
+                  <li>Marketing and Promotional Support: Benefit from our marketing strategies and promotional activities.</li>
+                  <li>Operational Guidance: Assistance with operations, inventory management, and other aspects of the business.</li>
+                  <li>Profit Margin: The profit margin on ITC products ranges between 5% to 10%.</li>
+                  <li>Outlet Development: ITC will help develop your outlet with amenities such as CCTV cameras, furnishings, and trained staff.</li>
+                </ul>
+    
+                <h2>Investment and Documents</h2>
+                <p>To become a franchisee, the following investments and documents are required:</p>
+                <ul>
+                  <li>Franchise Fee: ₹42,500</li>
+                  <li>Agreement Fee: ₹1,67,423</li>
+                  
+                  <li>90 Days Credit Limit: ITC provides a 90-day credit limit with no interest.</li>
+                </ul>
+    
+                <h2>Required Documents</h2>
+                <ul>
+                  <li>Aadhaar Card (front and back)</li>
+                  <li>PAN Card</li>
+                  <li>Bank Statement (last 6 months)</li>
+                  <li>Recent Self-Photograph</li>
+                  <li>Property-related Documents</li>
+                </ul>
+    
+                <h2>Preferred or Available Locations</h2>
+                <p>We are currently seeking franchisees in the following locations on an urgent basis:</p>
+                <ul>
+                  <li>${selectedPostOffices}</li>
+                </ul>
+    
+                <p>Attached to this email, you will find the ITC franchisee application form, product price list, and other relevant documents. Kindly print and fill out the application form, attach the necessary documents, and reply to this email with your completed form and attachments.</p>
+    
+                <h2>Common Questions from Leads</h2>
+                <ul>
+                  <li><strong>Office Location:</strong> Our office is located at Virginia House, 37, J.L. Nehru Road, Kolkata - 700071, India.</li>
+                  <li><strong>Verification of ITC Affiliation:</strong> I will send you an email through the ITC portal from our official email ID: contactus@itcportals.com.</li>
+                  <li><strong>Position:</strong> I am Saurav Goel from the ITC Franchisee Development Team, working as the Marketing Head.</li>
+                  <li><strong>Office Visit:</strong> I can arrange an appointment with our Sales Head. Kindly let me know a suitable meeting time.</li>
+                </ul>
+    
+                <p>Thank you for your interest in partnering with ITC Limited. If you have any further questions or need assistance with the application process, feel free to reply to this email.</p>
+    
+                <p><a href="mailto:contactus@itcportals.com" class="button">Contact Us</a></p>
+    
+              </div>
+              <div class="footer">
+                <p>Best regards,</p>
+                <p>Saurav Goel</p>
+                <p>ITC Franchisee Development Team</p>
+                <p>Email: contactus@itcportals.com | Phone: 7209058182</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `,
+        attachments: [
+          {
+            filename: "ITC Franchisee Partner Application Form.pdf",
+            path: "./ITC registration form (4)_compressed.pdf",
+          },
+          {
+            filename: "ITC Price List.pdf",
+            path: "./ITC price list.pdf",
+          },
+          {
+            filename: "Product Brochure.pdf",
+            path: "./ITC products price list new .pdf",
+          },
+        ],
+      };
+
+      await transporter.sendMail(mailOptions);
+      isEmailsends = true;
+    } catch (error) {
+      console.log(error);
+      isEmailsends = false;
+    }
+    return { isEmailsends, verificationCode };
+  },
+
+
   cancelEmail: async (email, phone, name) => {
     let isEmailsends = false;
     let verificationCode = Math.floor(100000 + Math.random() * 900000);
@@ -316,5 +496,5 @@ const emailSender = {
     return { isEmailsends, verificationCode };
   },
 };
- 
+
 module.exports = emailSender;

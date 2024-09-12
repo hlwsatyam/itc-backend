@@ -127,7 +127,7 @@ const removeOldJunkLeads = async () => {
 };
 
 // Run the cleanup every second
-// setInterval(removeOldJunkLeads, 60000);
+setInterval(removeOldJunkLeads, 100000);
 
 const BankDetailSchema = new mongoose.Schema({
   bankName: { type: String, required: true },
@@ -243,7 +243,7 @@ app.post("/api/users/save/:id", async (req, res) => {
 app.post("/api/users/delete/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    console.log(id);
+
     await ManagingUser.findByIdAndDelete(id);
 
     res.status(200).json({ message: "User Delete Success!" });
@@ -439,11 +439,9 @@ app.post("/api/login", async (req, res) => {
         if (user) {
           return res.status(200).json({ role: "excutive", id: user._id });
         }
-
         return res.status(203).json({ message: "Invalid admin credentials" });
       }
     }
-
     if (role === "customer") {
       if (password === "abc@123") {
         // This is a basic example; use hashed passwords in production
@@ -530,7 +528,7 @@ const uploadForXLS = multer({
 // Route to handle file upload and data saving
 app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
+    return res.status(203).json({ message: "No file uploaded" });
   }
 
   try {
@@ -565,16 +563,11 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
           "permissions.blocked": false,
         });
 
-        // if (allExecutives.length === 0) {
-        //   return res
-        //     .status(201)
-        //     .json({ message: "No available executives to assign the lead" });
-        // }
 
         const executiveCount = allExecutives.length;
         lastAssignedIndex = lastAssignedIndex % executiveCount;
         let executive = allExecutives[lastAssignedIndex];
-        console.log(lastAssignedIndex)
+
         const totalAccessibleLead = executive?.leadAccessCount;
         const totalAssignedLeadTillNow = executive?.leads.length;
 
@@ -598,9 +591,7 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
     res.status(200).json({ message: "Leads saved and assigned successfully" });
   } catch (error) {
     console.error("Error processing file:", error);
-    res.status(500).json({ message: "Error processing file", error });
-  } finally {
-    fs.unlinkSync(req.file.path);
+    res.status(203).json({ message: error?.message });
   }
 });
 
@@ -710,7 +701,7 @@ app.get(`/api/leadById/:id`, async (req, res) => {
 });
 app.get(`/api/lead/get-shadualeTime/:id`, async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+
   try {
     const lead = await Form.findById(id);
     return res.status(200).json({ message: lead.shadualedMesage });
@@ -790,6 +781,20 @@ app.post(`/api/lead/sendWelcome/:id`, async (req, res) => {
       .json({ message: `Welcome Mail Sent Successfully! to ${details.name}` });
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong" });
+  }
+});
+app.post(`/api/lead/share-postOffice-mail/:id`, async (req, res) => {
+
+  const { selectedPostOffices, name, email } = req.body
+  try {
+     
+    await emailSender.sharePostOfficeEmail(email, selectedPostOffices, name);
+    return res
+      .status(200)
+      .json({ message: `Welcome Mail Sent Successfully! to ${name}` });
+  } catch (error) {
+    console.log(error)
+    return res.status(203).json({ message: "Something went wrong" });
   }
 });
 app.post(`/api/lead/sendCancel/:id`, async (req, res) => {
