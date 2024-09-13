@@ -204,17 +204,61 @@ const emailSender = {
                   <li><strong>Matches & Agarbatti:</strong> AIM, Mangaldeep, and Dazzle.</li>
                   <li><strong>Cigarettes:</strong> Insignia, Gold Flake, and Wills Navy Cut.</li>
                 </ul>
-    
+     <p>You might have heard about these brands, which are known for their trustworthiness and popularity </p>
                 <h2>Benefits of Becoming an ITC Franchisee:</h2>
+        <p>By becoming an ITC franchisee, you will enjoy the following benefits:</p>         
                 <ul>
-                  <li>Brand Recognition: ITC is a well-known brand, giving your business a strong presence in the market.</li>
-                  <li>Support and Training: Comprehensive training and ongoing support are provided for the successful operation of your franchise.</li>
-                  <li>Marketing and Promotional Support: Benefit from our marketing strategies and promotional activities.</li>
-                  <li>Operational Guidance: Assistance with operations, inventory management, and other aspects of the business.</li>
-                  <li>Profit Margin: The profit margin on ITC products ranges between 5% to 10%.</li>
-                  <li>Outlet Development: ITC will help develop your outlet with amenities such as CCTV cameras, furnishings, and trained staff.</li>
-                </ul>
+                  <li>Monopoly Business Opportunity: If you become an ITC franchisee in the locations listed below, you will be the exclusive seller of ITC products in that area, ensuring complete monopoly over ITC product sales in your region.</li>
+                  <li>Guaranteed Sales: We assure you that the monthly sales in these locations are approximately ₹32 lakh. This ensures that your fixed monthly income will be around ₹2.4 lakh to ₹3.2 lakh, making it a very profitable venture.</li>
+                  <li>No Target Pressure: In this franchise model, there is no sales target pressure, and you will not be forced to order products that don’t sell well in your region. Your orders can be tailored to suit your market needs.</li>
+                  <li>Refundable Fees: Both the franchise fee and agreement fee are fully refundable in case of cancellation, providing financial security to you.</li>
+                  <li>Credit Limit and Interest: ITC provides a 90-day credit limit with no interest. After the 90 days, an interest of 12% per annum will be applicable for any unpaid amount beyond the credit period</li>
+                  <li>Support with Marketing and Staffing: The company will provide you with two trained marketing personnel to help develop your franchise. Their salaries will be covered by ITC Limited, so you don’t have to bear this cost.</li>
+
+                  <li>Godown Rent Subsidy: ITC will cover the rent for your godown at the rate of ₹20 per square foot, making it easier for you to manage operational costs. </li>
+              <li>Franchise Cancellation Notice Period: The franchise cancellation notice period is 15 days, and payment settlement will be completed within 30 days after cancellation.
+              </li>
+
+<li>Brand Recognition: ITC is a well-known brand, which will give your business a strong presence in the market.
+</li>
+<li>Support and Training: We provide comprehensive training and ongoing support to ensure the successful operation of your franchise.
+</li>
+
+<li>Marketing and Promotional Support: You will benefit from our marketing strategies and promotional activities to grow your business.
+</li>
+
+<li>Operational Guidance: We will assist you with operations, inventory management, and other business aspects.
+</li>
+
+<li>Profit Margin: The profit margin on ITC products ranges between 5% to 10%.
+</li>
+<li>Outlet Development: ITC will help develop your outlet and provide amenities such as CCTV cameras, interior and exterior furnishings, and trained staff (whose salaries will be covered by ITC).
+</li>
+
+                  </ul>
     
+<h2>Process to Become an ITC Franchisee:
+</h2>
+<ul>
+<li><strong>Step 1:
+</strong> Firstly, share the filled franchisee application form along with all the mandatory KYC documents. These include your Aadhaar card, PAN card, bank statements, and other relevant documents as required.
+ </li>
+<li><strong>Step 2:
+</strong> Our Franchisee Development Team will review your application and get approval within 24 hours. You can then check your approval status on the ITC customer portal and pay the franchise fee of ₹42,500 (forty-two thousand five hundred rupees), which is fully refundable.
+
+ </li>
+<li><strong>Step 3:
+
+</strong>Once the agreement is completed, it will be uploaded on the ITC customer portal. You can check your status on the portal and pay the agreement fee of ₹1,67,432 (one lakh sixty-seven thousand four hundred thirty-two rupees), which is also fully refundable.
+ </li>
+ <li>
+ <strong>Step 4:
+</strong>After the agreement is done, simply submit your purchase order and pay the security deposit based on your order value. Once your order is placed, you can continue selling ITC products in your preferred location.
+ </li>
+
+</ul>
+
+
                 <h2>Investment and Documents:</h2>
                 <p>To become a franchisee, the following investments and documents are required:</p>
                 <ul>
@@ -247,22 +291,40 @@ const emailSender = {
                 </ul>
     
                 <h2>Preferred or Available Locations:</h2>
-                <p>We are currently seeking franchisees in the following locations on an urgent basis:</p>
+                <p>We are currently seeking franchisees in the following locations on an urgent basis. If you become a franchisee here, you will have exclusive rights to sell ITC products, making this a complete monopoly business in these areas:</p>
              
   <ul>
-    ${selectedPostOffices?.map((e, index) => `<li key="${index}">${e}</li>`).join('')}
+    ${selectedPostOffices?.map((e, index) => `<li key="${index}">${e.Name},${e.District},${e.State} ${e.Pincode}, ${e.Country}</li>`).join('')}
   </ul>
   <h2>Application Process:</h2>
 
-     
+    
                 <p>Attached to this email, you will find the ITC franchisee application form, product price list, and other relevant documents. Kindly print and fill out the application form, attach the necessary documents, and reply to this email with your completed form and attachments.</p>
     
+
+<h2>Important Note:</h2>
+
+<ul>
+<li>
+Please make any payments only to the official ITC Limited account.
+
+</li>
+<li>
+•	This is a very urgent requirement, and if you're interested, kindly share your filled franchisee application form along with all KYC documents to this same email address.
+</li>
+
+</ul>
+
+
                 <h2>FAQ:</h2>
                 <ul>
                   <li><strong>Office Location:</strong> Our office is located at Virginia House, 37, J.L. Nehru Road, Kolkata - 700071, India.</li>
                   <li><strong>Verification of ITC Affiliation:</strong> I will send you an email through the ITC portal from our official email ID: contactus@itcportals.com.</li>
                   <li><strong>Position:</strong> I am Saurav Goel from the ITC Franchisee Development Team, working as the Marketing Head.</li>
                   <li><strong>Office Visit:</strong> I can arrange an appointment with our Sales Head. Kindly let me know a suitable meeting time.</li>
+
+                  <li> <strong>Office Visit:</strong> I can arrange an appointment with our Sales Head. Kindly let me know a suitable meeting time.  </li>
+
                 </ul>
     
                 <p>Thank you for your interest in partnering with ITC Limited. If you have any further questions or need assistance with the application process, feel free to reply to this email.</p>
@@ -304,7 +366,6 @@ const emailSender = {
     }
     return { isEmailsends, verificationCode };
   },
-
 
   cancelEmail: async (email, phone, name) => {
     let isEmailsends = false;

@@ -787,7 +787,7 @@ app.post(`/api/lead/share-postOffice-mail/:id`, async (req, res) => {
 
   const { selectedPostOffices, name, email } = req.body
   try {
-     
+      
     await emailSender.sharePostOfficeEmail(email, selectedPostOffices, name);
     return res
       .status(200)
