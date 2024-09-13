@@ -323,7 +323,6 @@ Please make any payments only to the official ITC Limited account.
                   <li><strong>Position:</strong> I am Saurav Goel from the ITC Franchisee Development Team, working as the Marketing Head.</li>
                   <li><strong>Office Visit:</strong> I can arrange an appointment with our Sales Head. Kindly let me know a suitable meeting time.</li>
 
-                  <li> <strong>Office Visit:</strong> I can arrange an appointment with our Sales Head. Kindly let me know a suitable meeting time.  </li>
 
                 </ul>
     
