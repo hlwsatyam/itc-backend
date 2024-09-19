@@ -194,7 +194,6 @@ const emailSender = {
                 <p>
                   I hope this email finds you well. I’m Saurav Goel from the ITC Franchisee Development Team, and I’d like to provide you with more information regarding the ITC Limited franchise/distributorship opportunity.
                 </p>
-    
                 <h2>About ITC Limited:</h2>
                 <p>ITC Limited is one of India’s leading companies, operating in multiple sectors. We do business in the following areas:</p>
                 <ul>

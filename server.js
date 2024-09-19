@@ -37,7 +37,7 @@ const db = async () => {
     await mongoose
       .connect(
         "mongodb+srv://satyampandit021:20172522@rvbmhotelbooking.9hfzkrx.mongodb.net/itc?retryWrites=true&w=majority",
-        // "mongodb+srv://Athena:20172522@cluster0.ghheiye.mongodb.net/investment?retryWrites=true&w=majority",
+
         {}
       )
       .then(() => console.log("Db Connected"))
@@ -60,6 +60,10 @@ const formSchema = new mongoose.Schema(
     marriageStatus: String,
     leadManagementStages: { type: String, default: "New Lead" },
     address: String,
+    loanType: String,
+    loanAmount: String,
+    loanTenure: String,
+
     businessName: String,
     businessAddress: String,
     shadualedMesage: String,
@@ -89,10 +93,12 @@ const formSchema = new mongoose.Schema(
     "preferred_franchisee_segment_(select_one)": String,
     "preferred_business_type_(select_one)": String,
     approvalLetter: String,
+    rateOFintrest: String,
     agreementLetterName: String,
     purchaseOrderLetterName: String,
     approvalDate: String,
     email: String,
+    tenure: String,
     address: String,
     area: String,
     shaduleDateCount: Number,
@@ -103,7 +109,6 @@ const formSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed, // Holds the timeout reference
       default: null,
     },
-
     postOffice: String,
   },
   { timestamps: true }
@@ -125,7 +130,6 @@ const removeOldJunkLeads = async () => {
     console.error("Error deleting old junk leads:", error);
   }
 };
-
 // Run the cleanup every second
 setInterval(removeOldJunkLeads, 100000);
 
@@ -376,7 +380,7 @@ app.post("/api/submit", async (req, res) => {
     // Save form data to the database
     await formData.save();
 
-    // Find all executives who are not blocked
+    // // Find all executives who are not blocked
     const allExecutives = await ManagingUser.find({
       "permissions.blocked": false,
     });
@@ -423,6 +427,41 @@ app.post("/api/editSave/:id", async (req, res) => {
     res.status(500).send("Failed to save form data");
   }
 });
+app.post("/api/addLeadByExcutive/:id", async (req, res) => {
+  const { id } = req.params;
+  const { mobile } = req.body;
+ 
+  try { 
+    // Check if the mobile number exists first
+    const mobileExists = await Form.exists({ mobile });
+
+    if (mobileExists) {
+      return res.status(203).json({ message: "This Mobile Number Already Exists" });
+    }
+
+    // Create the form data immediately
+    const formData = new Form({ ...req.body, isSomethingChange: false, leadManagementStages: "welcome mail sent" });
+
+    // Perform the update and form creation in parallel
+    await Promise.all([
+      // Update the managing user's leadAccessCount and leads array in one operation
+      ManagingUser.findByIdAndUpdate(
+        id,
+        {
+          $inc: { leadAccessCount: 1 },
+          $push: { leads: formData._id }
+        }
+      ),
+      // Save the form data
+      formData.save()
+    ]);
+    await emailSender.sharePostOfficeEmail(req.body.email, req.body.selectedPostOffice, req.body?.name);
+    res.status(200).json({ message: "Form data updated successfully" });
+  } catch (error) {
+    res.status(500).send("Failed to save form data");
+  }
+});
+
 app.post("/api/login", async (req, res) => {
   const { email, password, role } = req.body;
 
@@ -646,12 +685,13 @@ app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
     req.body;
 
   // Validate input
-  if (!id || !excutiveId) {
-    return res.status(400).json({ message: "You Are Not Authorized!" });
+  if (!id) {
+
+    return res.status(203).json({ message: "You Are Not Authorized!" });
   }
   if (!selectedDate) {
     return res
-      .status(400)
+      .status(203)
       .json({ message: "Please Select a Valid Time Zone!" });
   }
 
@@ -787,7 +827,7 @@ app.post(`/api/lead/share-postOffice-mail/:id`, async (req, res) => {
 
   const { selectedPostOffices, name, email } = req.body
   try {
-      
+
     await emailSender.sharePostOfficeEmail(email, selectedPostOffices, name);
     return res
       .status(200)
