@@ -104,6 +104,7 @@ const formSchema = new mongoose.Schema(
     shaduleDateCount: Number,
     pincode: String,
     disctict: String,
+    selectedTime: String,
     state: String,
     junkLeadTimer: {
       type: mongoose.Schema.Types.Mixed, // Holds the timeout reference
@@ -430,8 +431,8 @@ app.post("/api/editSave/:id", async (req, res) => {
 app.post("/api/addLeadByExcutive/:id", async (req, res) => {
   const { id } = req.params;
   const { mobile } = req.body;
- 
-  try { 
+
+  try {
     // Check if the mobile number exists first
     const mobileExists = await Form.exists({ mobile });
 
@@ -636,6 +637,7 @@ app.post("/api/lead/insert", uploadForXLS.single("file"), async (req, res) => {
 
 app.post(`/api/shaduale-lead/:id`, async (req, res) => {
   const { id } = req.params;
+
   try {
     const leads = await ManagingUser.findById(id).populate("leads");
     const lead = leads.filer((l) => l.shadualeTime != "");
@@ -681,7 +683,7 @@ app.post(`/api/shaduale-lead/:id`, async (req, res) => {
 // });
 
 app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
-  const { id, excutiveId, shaduleDateCount, shadualedMesage, selectedDate } =
+  const { id, excutiveId, selectedTime, shaduleDateCount, shadualedMesage, selectedDate } =
     req.body;
 
   // Validate input
@@ -689,10 +691,16 @@ app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
 
     return res.status(203).json({ message: "You Are Not Authorized!" });
   }
-  if (!selectedDate) {
+
+  if (selectedDate === "01/01") {
     return res
       .status(203)
-      .json({ message: "Please Select a Valid Time Zone!" });
+      .json({ message: "Please Select a Valid Date Zone!" });
+  }
+  if (!selectedTime) {
+    return res
+      .status(203)
+      .json({ message: "Please Select a Valid Time" });
   }
 
   try {
@@ -703,6 +711,7 @@ app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
     await Form.findByIdAndUpdate(id, {
       shadualeTime: newShadualeTime,
       shadualedMesage,
+      selectedTime,
       isSomethingChange: true,
       shaduleDateCount,
     });
@@ -712,7 +721,6 @@ app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
 app.post(`/api/lead/leadManagementStages/:id`, async (req, res) => {
   const { leadManagementStage } = req.body;
   const { id } = req.params;
@@ -798,7 +806,6 @@ app.post(`/api/lead/excutive/:query`, async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 });
-
 app.post(`/api/lead/delete/:id`, async (req, res) => {
   const { id } = req.params;
   try {
@@ -808,7 +815,6 @@ app.post(`/api/lead/delete/:id`, async (req, res) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 });
-
 app.post(`/api/lead/sendWelcome/:id`, async (req, res) => {
   const { id } = req.params;
   try {
@@ -897,7 +903,6 @@ app.post(`/api/lead/sendBankDetail/:id`, async (req, res) => {
 //     return res.status(500).json({ message: "Something went wrong" });
 //   }
 // });
-
 app.post(
   `/api/lead/sendAgreement/:id`,
   upload.single("file"),
@@ -976,11 +981,9 @@ app.post(
     }
   }
 );
-
 app.get("/api", async (req, res) => {
   return res.send("Hello latest vps js");
 });
-
 app.post("/api/bank-details", async (req, res) => {
   const { bankName, accountNumber, ifscCode, holderName } = req.body;
 
@@ -1005,7 +1008,6 @@ app.get("/api/bank-details", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch bank details" });
   }
 });
-
 app.delete("/api/bank-details/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -1020,4 +1022,4 @@ app.delete("/api/bank-details/:id", async (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
+}); 
