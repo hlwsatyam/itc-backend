@@ -684,7 +684,7 @@ app.post(`/api/shaduale-lead/:id`, async (req, res) => {
 
 app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
   const { id, executiveId, isAdmin, selectedTime, scheduleDateCount, scheduledMessage, selectedDate } = req.body;
-  console.log(selectedTime)
+   
   // Validate input
   if (!id) {
     return res.status(203).json({ message: "You Are Not Authorized!" });
@@ -718,14 +718,16 @@ app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
     }
 
     // Update the lead with the new schedule time
-    await Form.findByIdAndUpdate(id, {
-      scheduleTime: newScheduleTime,
+  const s=  await Form.findByIdAndUpdate(id, {
+    shadualeTime: newScheduleTime,
       scheduledMessage,
       selectedTime,
       isSomethingChange: true,
       scheduleDateCount,
-    });
+    }, { new: true });
 
+
+   
     return res.status(200).json({ message: "Meeting Scheduled!" });
   } catch (error) {
     console.error(error); // Log the error for debugging
