@@ -766,11 +766,11 @@ app.get(`/api/lead/get-shadualeTime/:id`, async (req, res) => {
 
   try {
     const lead = await Form.findById(id);
-    return res.status(200).json({ message: lead.shadualedMesage });
+    return res.status(200).json({ message: lead.shadualedMesage,date: lead.shadualeTime, time: lead.selectedTime });
   } catch (error) {
     return res.status(203).json({ message: "Something went wrong" });
   }
-});
+}); 
 app.post(`/api/leads/:query`, async (req, res) => {
   const { query } = req.params;
 
