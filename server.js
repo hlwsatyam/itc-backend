@@ -683,44 +683,56 @@ app.post(`/api/shaduale-lead/:id`, async (req, res) => {
 // });
 
 app.post(`/api/lead/update-shadualeTime`, async (req, res) => {
-  const { id, excutiveId, selectedTime, shaduleDateCount, shadualedMesage, selectedDate } =
-    req.body;
-
+  const { id, executiveId, isAdmin, selectedTime, scheduleDateCount, scheduledMessage, selectedDate } = req.body;
+  console.log(selectedTime)
   // Validate input
   if (!id) {
-
     return res.status(203).json({ message: "You Are Not Authorized!" });
   }
 
-  if (selectedDate === "01/01") {
-    return res
-      .status(203)
-      .json({ message: "Please Select a Valid Date Zone!" });
+  if (isAdmin) {
+    return res.status(203).json({ message: "Executive can only scheduale !" });
   }
+
+  if (selectedDate === "01/01") {
+    return res.status(203).json({ message: "Please Select a Valid Date Zone!" });
+  }
+
   if (!selectedTime) {
-    return res
-      .status(203)
-      .json({ message: "Please Select a Valid Time" });
+    return res.status(203).json({ message: "Please Select a Valid Time" });
   }
 
   try {
-    // Build the new shadualeTime string
-    const newShadualeTime = `${selectedDate}`;
+    // Build the new scheduleTime string
+    const newScheduleTime = `${selectedDate}`;
+
+    const leadsOfManagingUser = await ManagingUser.findById(executiveId).populate('leads');
+
+    // Check if the selected time is already booked
+    const isTimeBooked = leadsOfManagingUser.leads.some(
+      (lead) => lead.shadualeTime === newScheduleTime && lead.selectedTime === selectedTime
+    );
+
+    if (isTimeBooked) {
+      return res.status(203).json({ message: "This time is already booked on the selected date." });
+    }
 
     // Update the lead with the new schedule time
     await Form.findByIdAndUpdate(id, {
-      shadualeTime: newShadualeTime,
-      shadualedMesage,
+      scheduleTime: newScheduleTime,
+      scheduledMessage,
       selectedTime,
       isSomethingChange: true,
-      shaduleDateCount,
+      scheduleDateCount,
     });
 
     return res.status(200).json({ message: "Meeting Scheduled!" });
   } catch (error) {
+    console.error(error); // Log the error for debugging
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 app.post(`/api/lead/leadManagementStages/:id`, async (req, res) => {
   const { leadManagementStage } = req.body;
   const { id } = req.params;
